@@ -13,17 +13,16 @@ class Card:
         return f'|{self.value}{self.suit}|'
 
 
-suits = ['hearts', 'diamonds', 'spades', 'clubs']
-suits = ['♡', '♢', '♠', '♣']
+# SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
+# SUITS = ['h', 'd', 's', 'c']
+SUITS = ['♡', '♢', '♠', '♣']
 
-deck = [Card(value, suit) for value in range(1, 14) for suit in suits]
-
-random.shuffle(deck)
+DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
 
 
 # PRINT FUNCTIONS
 def printdeck():
-    for card in deck:
+    for card in DECK:
         print(card.value, card.suit)
 
 
@@ -63,7 +62,7 @@ def printtable():
 
 
 # BUILD STACKS
-stock = deck[:24]
+stock = DECK[:24]
 for card in stock:
     card.flipped = True
 pile = []
@@ -73,13 +72,13 @@ foundation2 = []
 foundation3 = []
 foundation4 = []
 
-tableau1 = deck[24:25]; tableau1[-1].flipped = True
-tableau2 = deck[25:27]; tableau2[-1].flipped = True
-tableau3 = deck[27:30]; tableau3[-1].flipped = True
-tableau4 = deck[30:34]; tableau4[-1].flipped = True
-tableau5 = deck[34:39]; tableau5[-1].flipped = True
-tableau6 = deck[39:45]; tableau6[-1].flipped = True
-tableau7 = deck[45:52]; tableau7[-1].flipped = True
+tableau1 = DECK[24:25]; tableau1[-1].flipped = True
+tableau2 = DECK[25:27]; tableau2[-1].flipped = True
+tableau3 = DECK[27:30]; tableau3[-1].flipped = True
+tableau4 = DECK[30:34]; tableau4[-1].flipped = True
+tableau5 = DECK[34:39]; tableau5[-1].flipped = True
+tableau6 = DECK[39:45]; tableau6[-1].flipped = True
+tableau7 = DECK[45:52]; tableau7[-1].flipped = True
 
 tableaus = [pile, tableau1, tableau2, tableau3, tableau4, tableau5, tableau6, tableau7, foundation1, foundation2, foundation3, foundation4]
 
@@ -111,6 +110,7 @@ def moveinput(turn):
 
 
 if __name__ == "__main__":
+    random.shuffle(DECK)
     printtable()
     while True:
         turn = input("draw (d) / move (card_from_to): ")
