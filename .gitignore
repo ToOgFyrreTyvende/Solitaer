@@ -2,5 +2,11 @@
 .DS_Store
 node_modules/
 /dist/
+
+# Python venvs & stuff
 env/
+.venv
 __pycache__
+
+# Test files
+server/test.py
