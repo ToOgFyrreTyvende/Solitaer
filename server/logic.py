@@ -30,6 +30,8 @@ class Klondike:
     foundation2: List[Card] = field(default_factory=list)
     foundation3: List[Card] = field(default_factory=list)
     foundation4: List[Card] = field(default_factory=list)
+    tableaus: List[List[Card]] = None
+    foundations: List[List[Card]] = None
 
 
 # Constants
@@ -39,9 +41,9 @@ SUITS = ['♡', '♢', '♠', '♣']
 DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
 
 
-def build_game() -> Klondike:
+def build_game(no_shuffle: bool = False) -> Klondike:
     _DECK = [card for card in DECK]
-    random.shuffle(_DECK)
+    if no_shuffle: random.shuffle(_DECK)
     game = Klondike()
     game.stock = _DECK[:24]
     for card in game.stock: card.flipped = True
@@ -54,6 +56,9 @@ def build_game() -> Klondike:
     game.tableau5 = _DECK[34:39]; game.tableau5[-1].flipped = True
     game.tableau6 = _DECK[39:45]; game.tableau6[-1].flipped = True
     game.tableau7 = _DECK[45:52]; game.tableau7[-1].flipped = True
+
+    game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
+    game.tableaus = [game.tableau7, game.tableau6, game.tableau5, game.tableau4, game.tableau3, game.tableau2, game.tableau1]
 
     return game
 
@@ -103,9 +108,7 @@ def _tableau_str(tableau: List[Card]) -> str:
 
 
 def print_game(game: Klondike) -> None:
-    _foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
-    _tableaus = [game.tableau7, game.tableau6, game.tableau5, game.tableau4, game.tableau3, game.tableau2, game.tableau1]
-    for i, (foundation, tableau) in enumerate(zip_longest(_foundations, _tableaus)):
+    for i, (foundation, tableau) in enumerate(zip_longest(g.foundations, g.tableaus)):
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
         if i == 5 and len(game.pile) != 0:
