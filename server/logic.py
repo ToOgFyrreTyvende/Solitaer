@@ -12,7 +12,7 @@ class Card:
 
     def __repr__(self):
         """Card representation"""
-        return f'|{self.value:2}{self.suit}|'
+        return f'{self.value:2}{self.suit}'
 
 
 @dataclass
@@ -92,14 +92,14 @@ def _print_helper(base_stack: List[Card], tableau: List[Card]) -> str:
 
 
 def _foundation_str(foundation: List[Card]) -> str:
-    return str(foundation[-1]) if len(foundation) > 0 else '|   |'
+    return f'|{foundation[-1]}|' if len(foundation) > 0 else '|   |'
 
 
 def _tableau_str(tableau: List[Card]) -> str:
     result = ''
     for card in tableau:
-        result += str(card) if card.flipped else '|###'
-    return result
+        result += f'|{card}' if card.flipped else '|###'
+    return result + '|'
 
 
 def print_game(game: Klondike) -> None:
@@ -109,7 +109,7 @@ def print_game(game: Klondike) -> None:
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
         if i == 5 and len(game.pile) != 0:
-            left = str(game.pile[-1])
+            left = f'|{game.pile[-1]}|'
         elif i == 6:
             left = '|###|' if len(game.stock) > 0 else '|   |'
         print(f'{left}\t{right}')
