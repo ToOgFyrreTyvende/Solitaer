@@ -26,6 +26,7 @@ class KlondikeTest(unittest.TestCase):
     def test_check_move(self):
         h1 = Card(1, _SUITS['h'])
         h2 = Card(2, _SUITS['h'])
+        hk = Card(13, _SUITS['h'])
         s1 = Card(1, _SUITS['s'])
         s2 = Card(2, _SUITS['s'])
         self.assertTrue(check_move(h1, [s2]))
@@ -34,6 +35,7 @@ class KlondikeTest(unittest.TestCase):
         self.assertFalse(check_move(h1, [h2]))
         self.assertTrue(check_move(h1, [], to_foundation=True))
         self.assertTrue(check_move(h2, [h1], to_foundation=True))
+        self.assertTrue(check_move(hk, []))
 
 
 if __name__ == "__main__":
