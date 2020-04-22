@@ -1,8 +1,8 @@
-import logic as l
+from logic import build_game
 
 
 def main():
-    g = l.build_game()
+    g = build_game()
 
 
 if __name__ == "__main__":
