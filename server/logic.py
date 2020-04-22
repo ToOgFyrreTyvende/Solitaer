@@ -99,6 +99,7 @@ def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[L
 
 
 def check_move(card: Card, target: Card, to_foundation: bool = False) -> bool:
+    """Checks if it is legal to move 'card' to 'target'."""
     if not isinstance(card, Card) and not isinstance(target, Card): raise TypeError
 
     if to_foundation: return card.suit == target.suit and card.value == target.value + 1
