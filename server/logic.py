@@ -64,7 +64,7 @@ def build_game(shuffle: bool = True) -> Klondike:
     game.tableau7 = _deck[45:52]; game.tableau7[-1].flipped = True
 
     game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
-    game.tableaus = [game.tableau7, game.tableau6, game.tableau5, game.tableau4, game.tableau3, game.tableau2, game.tableau1]
+    game.tableaus = [game.tableau1, game.tableau2, game.tableau3, game.tableau4, game.tableau5, game.tableau6, game.tableau7]
 
     return game
 
@@ -114,7 +114,7 @@ def _tableau_str(tableau: List[Card]) -> str:
 
 
 def print_game(game: Klondike) -> None:
-    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, game.tableaus)):
+    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
         if i == 5 and len(game.pile) != 0:
