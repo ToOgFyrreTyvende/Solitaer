@@ -63,7 +63,7 @@ def build_game(no_shuffle: bool = False) -> Klondike:
     return game
 
 
-def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[Card]]:
+def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[Card], List[Card]]:
     _stock = [card for card in stock]
     _pile = [card for card in pile]
 
@@ -80,7 +80,7 @@ def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[C
     return _stock, _pile
 
 
-def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[List[Card]]:
+def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[List[Card], List[Card]]:
     _from = [card for card in stack_from]
     _to = [card for card in stack_to]
 
