@@ -98,12 +98,15 @@ def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[L
     return _from, _to
 
 
-def check_move(card: Card, target: Card, to_foundation: bool = False) -> bool:
+def check_move(card: Card, target: List[Card], to_foundation: bool = False) -> bool:
     """Checks if it is legal to move 'card' to 'target'."""
-    if not isinstance(card, Card) and not isinstance(target, Card): raise TypeError
+    if not isinstance(card, Card) and not isinstance(target, List): raise TypeError
+    if len(target) == 0:
+        if to_foundation: return card.value == 1
+        else: return card.value == 13
 
-    if to_foundation: return card.suit == target.suit and card.value == target.value + 1
-    else: return card.is_black != target.is_black and card.value == target.value - 1
+    if to_foundation: return card.suit == target[-1].suit and card.value == target[-1].value + 1
+    else: return card.is_black != target[-1].is_black and card.value == target[-1].value - 1
 
 
 def _print_helper(base_stack: List[Card], tableau: List[Card]) -> str:

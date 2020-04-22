@@ -28,11 +28,12 @@ class KlondikeTest(unittest.TestCase):
         h2 = Card(2, _SUITS['h'])
         s1 = Card(1, _SUITS['s'])
         s2 = Card(2, _SUITS['s'])
-        self.assertTrue(check_move(h1, s2))
-        self.assertTrue(check_move(s1, h2))
-        self.assertFalse(check_move(h1, s1))
-        self.assertFalse(check_move(h1, h2))
-        self.assertTrue(check_move(h2, h1, to_foundation=True))
+        self.assertTrue(check_move(h1, [s2]))
+        self.assertTrue(check_move(s1, [h2]))
+        self.assertFalse(check_move(h1, [s1]))
+        self.assertFalse(check_move(h1, [h2]))
+        self.assertTrue(check_move(h1, [], to_foundation=True))
+        self.assertTrue(check_move(h2, [h1], to_foundation=True))
 
 
 if __name__ == "__main__":
