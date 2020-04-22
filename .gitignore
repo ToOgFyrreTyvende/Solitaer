@@ -1,7 +1,10 @@
-.vscode/
 .DS_Store
 node_modules/
 /dist/
+
+# IDE/Editor files/folders
+.vscode
+.idea
 
 # Python venvs & stuff
 env/
