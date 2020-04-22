@@ -108,7 +108,7 @@ def _tableau_str(tableau: List[Card]) -> str:
 
 
 def print_game(game: Klondike) -> None:
-    for i, (foundation, tableau) in enumerate(zip_longest(g.foundations, g.tableaus)):
+    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, game.tableaus)):
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
         if i == 5 and len(game.pile) != 0:
