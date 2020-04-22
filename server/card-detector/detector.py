@@ -9,8 +9,8 @@ IMAGE_H = 720
 
 image_test = cv2.imread('cards2.jpg')
 processed_img = threshold_image(image_test)
-cnts = find_number_suit(processed_img)
-cv2.drawContours(image_test, cnts, -1, (0,255,0), 3)
+cnts = find_number_suit(processed_img, image_test)
+#cv2.drawContours(image_test, cnts, -1, (0,255,0), 3)
 
 cv2.imshow('result', image_test)
 cv2.waitKey(0)
