@@ -4,11 +4,21 @@ from itertools import zip_longest
 import random
 
 
+# Constants
+# SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
+# SUITS = ['h', 'd', 's', 'c']
+SUITS = ['♡', '♢', '♠', '♣']
+
+
 @dataclass
 class Card:
     value: int
     suit: str
     flipped: bool = False
+
+    @property
+    def is_black(self):
+        return self.suit == '♠' or self.suit == '♣'
 
     def __repr__(self):
         """Card representation"""
@@ -34,28 +44,24 @@ class Klondike:
     foundations: List[List[Card]] = None
 
 
-# Constants
-# SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
-# SUITS = ['h', 'd', 's', 'c']
-SUITS = ['♡', '♢', '♠', '♣']
-DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
 
 
-def build_game(no_shuffle: bool = False) -> Klondike:
-    _DECK = [card for card in DECK]
-    if no_shuffle: random.shuffle(_DECK)
+def build_game(shuffle: bool = True) -> Klondike:
+    _deck = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+    if shuffle: random.shuffle(_deck)
     game = Klondike()
-    game.stock = _DECK[:24]
+    game.stock = _deck[:24]
     for card in game.stock: card.flipped = True
     game.pile = []
 
-    game.tableau1 = _DECK[24:25]; game.tableau1[-1].flipped = True
-    game.tableau2 = _DECK[25:27]; game.tableau2[-1].flipped = True
-    game.tableau3 = _DECK[27:30]; game.tableau3[-1].flipped = True
-    game.tableau4 = _DECK[30:34]; game.tableau4[-1].flipped = True
-    game.tableau5 = _DECK[34:39]; game.tableau5[-1].flipped = True
-    game.tableau6 = _DECK[39:45]; game.tableau6[-1].flipped = True
-    game.tableau7 = _DECK[45:52]; game.tableau7[-1].flipped = True
+    game.tableau1 = _deck[24:25]; game.tableau1[-1].flipped = True
+    game.tableau2 = _deck[25:27]; game.tableau2[-1].flipped = True
+    game.tableau3 = _deck[27:30]; game.tableau3[-1].flipped = True
+    game.tableau4 = _deck[30:34]; game.tableau4[-1].flipped = True
+    game.tableau5 = _deck[34:39]; game.tableau5[-1].flipped = True
+    game.tableau6 = _deck[39:45]; game.tableau6[-1].flipped = True
+    game.tableau7 = _deck[45:52]; game.tableau7[-1].flipped = True
 
     game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
     game.tableaus = [game.tableau7, game.tableau6, game.tableau5, game.tableau4, game.tableau3, game.tableau2, game.tableau1]
