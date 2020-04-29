@@ -1,8 +1,10 @@
-import logic as l
+from logic import build_game, print_game
 
 
 def main():
-    g = l.build_game()
+    g = build_game()
+    print(g.tableaus[0])
+    print_game(g)
 
 
 if __name__ == "__main__":

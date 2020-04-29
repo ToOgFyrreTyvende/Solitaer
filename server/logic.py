@@ -4,11 +4,21 @@ from itertools import zip_longest
 import random
 
 
+# Constants
+# SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
+# SUITS = ['h', 'd', 's', 'c']
+SUITS = ['♡', '♢', '♠', '♣']
+
+
 @dataclass
 class Card:
     value: int
     suit: str
     flipped: bool = False
+
+    @property
+    def is_black(self):
+        return self.suit == '♠' or self.suit == '♣'
 
     def __repr__(self):
         """Card representation"""
@@ -34,36 +44,32 @@ class Klondike:
     foundations: List[List[Card]] = None
 
 
-# Constants
-# SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
-# SUITS = ['h', 'd', 's', 'c']
-SUITS = ['♡', '♢', '♠', '♣']
-DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
 
 
-def build_game(no_shuffle: bool = False) -> Klondike:
-    _DECK = [card for card in DECK]
-    if no_shuffle: random.shuffle(_DECK)
+def build_game(shuffle: bool = True) -> Klondike:
+    _deck = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+    if shuffle: random.shuffle(_deck)
     game = Klondike()
-    game.stock = _DECK[:24]
+    game.stock = _deck[:24]
     for card in game.stock: card.flipped = True
     game.pile = []
 
-    game.tableau1 = _DECK[24:25]; game.tableau1[-1].flipped = True
-    game.tableau2 = _DECK[25:27]; game.tableau2[-1].flipped = True
-    game.tableau3 = _DECK[27:30]; game.tableau3[-1].flipped = True
-    game.tableau4 = _DECK[30:34]; game.tableau4[-1].flipped = True
-    game.tableau5 = _DECK[34:39]; game.tableau5[-1].flipped = True
-    game.tableau6 = _DECK[39:45]; game.tableau6[-1].flipped = True
-    game.tableau7 = _DECK[45:52]; game.tableau7[-1].flipped = True
+    game.tableau1 = _deck[24:25]; game.tableau1[-1].flipped = True
+    game.tableau2 = _deck[25:27]; game.tableau2[-1].flipped = True
+    game.tableau3 = _deck[27:30]; game.tableau3[-1].flipped = True
+    game.tableau4 = _deck[30:34]; game.tableau4[-1].flipped = True
+    game.tableau5 = _deck[34:39]; game.tableau5[-1].flipped = True
+    game.tableau6 = _deck[39:45]; game.tableau6[-1].flipped = True
+    game.tableau7 = _deck[45:52]; game.tableau7[-1].flipped = True
 
     game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
-    game.tableaus = [game.tableau7, game.tableau6, game.tableau5, game.tableau4, game.tableau3, game.tableau2, game.tableau1]
+    game.tableaus = [game.tableau1, game.tableau2, game.tableau3, game.tableau4, game.tableau5, game.tableau6, game.tableau7]
 
     return game
 
 
-def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[Card]]:
+def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[Card], List[Card]]:
     _stock = [card for card in stock]
     _pile = [card for card in pile]
 
@@ -80,7 +86,7 @@ def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[C
     return _stock, _pile
 
 
-def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[List[Card]]:
+def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[List[Card], List[Card]]:
     _from = [card for card in stack_from]
     _to = [card for card in stack_to]
 
@@ -90,6 +96,17 @@ def move(card_pos: int, stack_from: List[Card], stack_to: List[Card]) -> Tuple[L
             _from[-1].flipped = True
 
     return _from, _to
+
+
+def check_move(card: Card, target: List[Card], to_foundation: bool = False) -> bool:
+    """Checks if it is legal to move 'card' to 'target'."""
+    if not isinstance(card, Card) and not isinstance(target, List): raise TypeError
+    if len(target) == 0:
+        if to_foundation: return card.value == 1
+        else: return card.value == 13
+
+    if to_foundation: return card.suit == target[-1].suit and card.value == target[-1].value + 1
+    else: return card.is_black != target[-1].is_black and card.value == target[-1].value - 1
 
 
 def _print_helper(base_stack: List[Card], tableau: List[Card]) -> str:
@@ -108,7 +125,7 @@ def _tableau_str(tableau: List[Card]) -> str:
 
 
 def print_game(game: Klondike) -> None:
-    for i, (foundation, tableau) in enumerate(zip_longest(g.foundations, g.tableaus)):
+    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
         if i == 5 and len(game.pile) != 0:
