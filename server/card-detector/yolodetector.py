@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-VISUAL_MODE = True
+DEBUG = True
 CONFIDENCE_CUTOFF = 0.4
 CLASS_IDS = []
 
@@ -93,9 +93,12 @@ def infer_from_image(raw_img):
     outputs = nnet.forward(output_layers)
     detections = detect_cards(outputs, width, height)
     clean_detect = clean_detections(detections)
-    draw_cards(raw_img, clean_detect)
+    if DEBUG:
+        draw_cards(raw_img, clean_detect)
+    return clean_detect
 
-img = cv2.imread("cards3.jpg")
-infer_from_image(img)
-cv2.imshow("Image", img)
-cv2.waitKey(0)
+if DEBUG:
+    img = cv2.imread("cards3.jpg")
+    infer_from_image(img)
+    cv2.imshow("Image", img)
+    cv2.waitKey(0)
