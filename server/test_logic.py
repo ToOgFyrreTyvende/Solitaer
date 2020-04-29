@@ -37,6 +37,12 @@ class KlondikeTest(unittest.TestCase):
         self.assertTrue(check_move(h2, [h1], to_foundation=True))
         self.assertTrue(check_move(hk, []))
 
+    def test_move(self):
+        tableau1 = [Card(1, 'h'), Card(2, 'h'), Card(3, 'h'), Card(4, 'h')]
+        tableau2 = [Card(5, 'h')]
+
+        self.assertTupleEqual(move(1, tableau1, tableau2), (tableau1[:3], [Card(5, 'h'), Card(4, 'h')]))
+
 
 if __name__ == "__main__":
     unittest.main()
