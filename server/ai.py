@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple, Union
 
 from logic import build_game, print_game, move, draw, Klondike, check_move, Card
 
@@ -10,10 +10,49 @@ def get_nr_of_flipped(tableau: List[Card]) -> int:
             result += 1
     return result
 
+
 def game_won(g: Klondike):
     if len(g.foundations[0]) == 13 and len(g.foundations[1]) == 13 and len(g.foundations[2]) == 13 and len(g.foundations[3]) == 13:
         return True
     return False    
+
+
+def new_find_move(g: Klondike) -> Union[int, Tuple[int, List[Card], List[Card]]]:
+    """Finds a valid move to suggest as the next move
+
+    If a valid move exists, it returns an int and two card piles.
+    The int specifies the index from the first list to move to the other list
+    If no valid move is found, it returns an integer only:
+    -1 means you should draw from the pile
+    """
+
+    # Draw cards if the pile is empty and there are cards in the stock
+    if len(g.pile) == 0 and len(g.stock) != 0:
+        return -1
+
+    # Check tableaus for possible moves
+    for from_tableau in g.tableaus:
+        if len(from_tableau) == 0: continue  # Skip
+        for foundation in g.foundations:
+            if check_move(from_tableau[-1], foundation, to_foundation=True):
+                return 1, from_tableau, foundation
+        for to_tableau in g.tableaus:
+            nb_flipped = get_nr_of_flipped(from_tableau)
+            if from_tableau[-nb_flipped] == from_tableau[0] and from_tableau[0].value == 13: continue
+            if check_move(from_tableau[-nb_flipped], to_tableau):
+                return nb_flipped, from_tableau, to_tableau
+
+    # Check pile for possible moves
+    if len(g.pile) == 0:
+        for foundation in g.foundations:
+            if check_move(g.pile[-1], foundation, to_foundation=True):
+                return 1, g.pile, foundation
+        for tableau in g.tableaus:
+            if check_move(g.pile[-1], tableau):
+                return 1, g.pile, tableau
+
+    return -1  # No other options matched, therefore draw
+
 
 def find_move(g: Klondike):
     moves = 0
