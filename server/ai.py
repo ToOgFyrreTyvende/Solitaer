@@ -38,7 +38,7 @@ def find_move(g: Klondike):
             # if len(g.tableaus[j]) == 0:
             #    print("Skip " + str(j+1))
             #    continue 
-            if check_move(g.tableaus[i][-1], g.tableaus[j]):
+            if check_move(g.tableaus[i][-get_nr_of_flipped(g.tableaus[i])], g.tableaus[j]):
                 g.tableaus[i], g.tableaus[j] = move(get_nr_of_flipped(g.tableaus[i]), g.tableaus[i], g.tableaus[j])
                 print("Match in tableau " + str(j+1) + " Move " + str(1) + " " + str(i+1) + " " + str(j+1))
                 print_game(g)
