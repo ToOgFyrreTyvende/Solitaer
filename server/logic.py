@@ -18,7 +18,7 @@ class Card:
 
     @property
     def is_black(self):
-        return self.suit == '♠' or self.suit == '♣'
+        return self.suit in SUITS[2:]
 
     def __repr__(self):
         """Card representation"""
