@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from helpers import *
-
+from numpy.linalg import norm
 
 DEBUG = True
 CONFIDENCE_CUTOFF = 0.3
@@ -98,20 +98,56 @@ def infer_from_image(raw_img):
         draw_cards(raw_img, clean_detect)
     return clean_detect
 
+
+def area(a, b, c) :
+    return 0.5 * norm( np.cross( b-a, c-a ) )
+
 def create_stacks(bboxes, detections):
     tableaus = []
-    for x, y, w, h in bboxes:
-        if y + h > 170:
+    print(bboxes)
+    for [A, B, C, D] in bboxes:
+        """
+        A------B
+        |\ ABC |
+        | \    |
+        |  \   |
+        |   \  |
+        |    \ |
+        | CDA \|
+        D------C
+        """
+        ABC = area(A, B, C)
+        CDA = area(C, D, A)
+        rect_area = ABC + CDA
+        if C[1] > 170:
             cards = []
             for class_id, confidence, pos in detections:
                 [cx, cy, cw, ch] = pos
-                x_mid = cx + cw/2
-                y_mid = cy + ch/2
-                if x_mid > x   and y_mid > y   and \
-                   x_mid < x+w and y_mid < y+h:
-                   cards.append(str(CLASS_IDS[class_id]))
-            tableaus.append((x, cards))
+                P = [cx + cw/2, cy + ch/2]
+                # https://math.stackexchange.com/a/190117
+                """
+                A-------------B
+                |\           /|
+                | \         / |
+                |  \  PBA  /  |
+                |   \     /   |
+                |    \   /    |
+                |     \ /     |
+                | APD  P  CPB |
+                |     / \     |
+                |    /   \    |
+                |   /     \   |
+                |  /  DPC  \  |
+                | /         \ |
+                |/           \|
+                D-------------C
+                If the APD + DPC + CPB + PBA > ABC + CDA, then the point P is not within the rectangle ABCD
+                """
+                area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                if area_check == rect_area:
+                    cards.append(str(CLASS_IDS[class_id]))
 
+        tableaus.append((A[0], cards))
     return [x[1] for x in sorted(tableaus, key=lambda x: x[0])]
 
 

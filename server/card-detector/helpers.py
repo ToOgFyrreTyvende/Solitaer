@@ -11,7 +11,7 @@ kernel = np.ones((5,5), np.uint8)
 def get_background_reference(gray_image):
     image_w, image_h  = np.shape(gray_image)[:2]
     # Select random pixel at the bottom left as background reference point
-    background_pixel = gray_image[int(image_w/100)][int(image_h/100)]
+    background_pixel =  gray_image[int(image_w/100)][int(image_h/100)]
     return background_pixel + BG_THRESHOLD
 
 def threshold_image(image):
@@ -36,12 +36,11 @@ def find_number_suit(thresholded_image, img):
         # Idea: Create approximation trapezoid
         # Use trapezoid corners as homography or warpperspective
         # https://stackoverflow.com/a/44156317
-
-        hull = cv2.convexHull(c)
-        cv2.drawContours(img,[hull],0,(0,255,0),2)
-        # x,y,w,h
-        brect = cv2.boundingRect(c)
-        rects.append(brect)
+        box = cv2.minAreaRect(c)
+        box = cv2.boxPoints(box)
+        box = np.array(box, dtype="int")
+        cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
+        rects.append(box)
         #h, status = cv2.findHomography(pts_src, pts_dst)
         #cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
 
