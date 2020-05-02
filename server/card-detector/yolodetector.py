@@ -1,12 +1,14 @@
 import cv2
 import numpy as np
+from helpers import *
+
 
 DEBUG = True
-CONFIDENCE_CUTOFF = 0.4
+CONFIDENCE_CUTOFF = 0.3
 CLASS_IDS = []
 
 # load neural network from YOLO weights and config
-nnet = cv2.dnn.readNet("cards.weights", "cards.cfg")
+nnet = cv2.dnn.readNet("yolocards_608.weights", "cards.cfg")
 
 # Read all object classes (card number + suit names) into an array
 with open("cards.names", "r") as f:
@@ -66,12 +68,11 @@ def clean_detections(detections):
     
 
 def draw_cards(img, detections):
-    print(detections)
     for class_id, confidence, pos in detections:
         [x, y, w, h] = pos
         label = str(CLASS_IDS[class_id])
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.putText(img, label, (x, y + 30), cv2.FONT_HERSHEY_PLAIN, 3, (125, 255, 0), 3)
+        cv2.putText(img, label, (x, y + 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 0), 3)
 
 
 def infer_from_image(raw_img):
@@ -87,7 +88,7 @@ def infer_from_image(raw_img):
     # Size given as the target resolution, YOLO takes 416x416 images
     # Mean is scalar values subtracted from channels. We do not change any color values.
     # SwapRB indicates swapping first and last channels in 3 channel images
-    blob = cv2.dnn.blobFromImage(img, 1/255, (416, 416), (0, 0, 0), True, crop=False)
+    blob = cv2.dnn.blobFromImage(img, 1/255, (608, 608), (0, 0, 0), True, crop=False)
     # Load binary image data into our neural network and infer
     nnet.setInput(blob)
     outputs = nnet.forward(output_layers)
@@ -97,8 +98,33 @@ def infer_from_image(raw_img):
         draw_cards(raw_img, clean_detect)
     return clean_detect
 
+def create_stacks(bboxes, detections):
+    tableaus = []
+    for x, y, w, h in bboxes:
+        if y + h > 170:
+            cards = []
+            for class_id, confidence, pos in detections:
+                [cx, cy, cw, ch] = pos
+                x_mid = cx + cw/2
+                y_mid = cy + ch/2
+                if x_mid > x   and y_mid > y   and \
+                   x_mid < x+w and y_mid < y+h:
+                   cards.append(str(CLASS_IDS[class_id]))
+            tableaus.append((x, cards))
+
+    return [x[1] for x in sorted(tableaus, key=lambda x: x[0])]
+
+
+
+
 if DEBUG:
-    img = cv2.imread("cards3.jpg")
-    infer_from_image(img)
+    img = cv2.resize(cv2.imread("cards5.jpg"), (1280,720))
+    
+    detections = infer_from_image(img)
+    processed_img = threshold_image(img)
+    #cv2.imshow("Image", processed_img)
+    bboxes = find_number_suit(processed_img, img)
+    tableaus = create_stacks(bboxes, detections)
+    print(tableaus)
     cv2.imshow("Image", img)
     cv2.waitKey(0)
