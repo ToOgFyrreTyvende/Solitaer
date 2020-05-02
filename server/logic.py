@@ -1,8 +1,9 @@
-from dataclasses import dataclass, field
-from typing import List, Tuple
-from itertools import zip_longest
-import random
+from __future__ import annotations
 
+import random
+from dataclasses import dataclass, field
+from itertools import zip_longest
+from typing import List, Tuple
 
 # Constants
 # SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
@@ -23,6 +24,16 @@ class Card:
     def __repr__(self):
         """Card representation"""
         return f'{self.value:2}{self.suit}'
+
+    @staticmethod
+    def from_str(string: str) -> Card:
+        name_values = {'K': 13, 'Q': 12, 'J': 11, 'A': 1}
+        if len(string) == 3:
+            return Card(value=10, suit=string[-1])
+        elif string[0] in name_values.keys():
+            return Card(value=name_values[string[0]], suit=string[-1])
+        else:
+            return Card(value=int(string[0]), suit=string[-1])
 
 
 @dataclass
