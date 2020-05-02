@@ -50,7 +50,7 @@ def new_find_move(g: Klondike) -> Union[int, Tuple[int, int], Tuple[int, int, in
                 return 2, from_id, to_id, nb_flipped  # code 2
 
     # Check pile for possible moves
-    if len(g.pile) == 0:
+    if len(g.pile):
         for f_id, foundation in enumerate(g.foundations):
             if check_move(g.pile[-1], foundation, to_foundation=True):
                 return 3, f_id  # code 3

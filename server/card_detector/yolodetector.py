@@ -1,17 +1,22 @@
 import cv2
 import numpy as np
-from helpers import *
+from card_detector.helpers import *
 from numpy.linalg import norm
+import os
 
 DEBUG = True
 CONFIDENCE_CUTOFF = 0.3
 CLASS_IDS = []
 
+dirname = os.path.dirname(__file__)
+weights = os.path.join(dirname, "yolocards_608.weights")
+names = os.path.join(dirname, "cards.names")
+cfg = os.path.join(dirname, "cards.cfg")
 # load neural network from YOLO weights and config
-nnet = cv2.dnn.readNet("yolocards_608.weights", "cards.cfg")
+nnet = cv2.dnn.readNet(weights, cfg)
 
 # Read all object classes (card number + suit names) into an array
-with open("cards.names", "r") as f:
+with open(names, "r") as f:
     CLASS_IDS = [line.strip() for line in f.readlines()]
 
 # extract darknet layers from model
@@ -103,9 +108,10 @@ def area(a, b, c) :
     return 0.5 * norm( np.cross( b-a, c-a ) )
 
 def create_stacks(bboxes, detections):
+    pile = None
+    foundations = []
     tableaus = []
-    print(bboxes)
-    for [A, B, C, D] in bboxes:
+    for (i, [A, B, C, D]) in enumerate(bboxes):
         """
         A------B
         |\ ABC |
@@ -146,9 +152,20 @@ def create_stacks(bboxes, detections):
                 area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
                 if area_check == rect_area:
                     cards.append(str(CLASS_IDS[class_id]))
+        else:
+            for class_id, confidence, pos in detections:
+                [cx, cy, cw, ch] = pos
+                P = [cx + cw/2, cy + ch/2]
+                area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                if area_check == rect_area:
+                    if i == 1:
+                        pile = str(CLASS_IDS[class_id])
+                    else:
+                        foundations.append(str(CLASS_IDS[class_id]))
+
 
         tableaus.append((A[0], cards))
-    return [x[1] for x in sorted(tableaus, key=lambda x: x[0])]
+    return (foundations[0], [foundations[1]], [x[1] for x in sorted(tableaus, key=lambda x: x[0])])
 
 def extract_cards_from_image(img):
     detections = infer_from_image(img)

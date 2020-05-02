@@ -7,8 +7,8 @@ from typing import List, Tuple
 
 # Constants
 # SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
-# SUITS = ['h', 'd', 's', 'c']
-SUITS = ['♡', '♢', '♠', '♣']
+SUITS = ['h', 'd', 's', 'c']
+#SUITS = ['♡', '♢', '♠', '♣']
 
 
 @dataclass
@@ -29,30 +29,30 @@ class Card:
     def from_str(string: str) -> Card:
         name_values = {'K': 13, 'Q': 12, 'J': 11, 'A': 1}
         if len(string) == 3:
-            return Card(value=10, suit=string[-1])
+            return Card(value=10, suit=string[-1], flipped = True)
         elif string[0] in name_values.keys():
-            return Card(value=name_values[string[0]], suit=string[-1])
+            return Card(value=name_values[string[0]], suit=string[-1], flipped = True)
         else:
-            return Card(value=int(string[0]), suit=string[-1])
+            return Card(value=int(string[0]), suit=string[-1], flipped = True)
 
 
 @dataclass
 class Klondike:
-    stock: List[Card] = None
-    pile: List[Card] = None
-    tableau1: List[Card] = None
-    tableau2: List[Card] = None
-    tableau3: List[Card] = None
-    tableau4: List[Card] = None
-    tableau5: List[Card] = None
-    tableau6: List[Card] = None
-    tableau7: List[Card] = None
+    stock: List[Card] = field(default_factory=list)
+    pile: List[Card] = field(default_factory=list)
+    tableau1: List[Card] = field(default_factory=list)
+    tableau2: List[Card] = field(default_factory=list)
+    tableau3: List[Card] = field(default_factory=list)
+    tableau4: List[Card] = field(default_factory=list)
+    tableau5: List[Card] = field(default_factory=list)
+    tableau6: List[Card] = field(default_factory=list)
+    tableau7: List[Card] = field(default_factory=list)
     foundation1: List[Card] = field(default_factory=list)
     foundation2: List[Card] = field(default_factory=list)
     foundation3: List[Card] = field(default_factory=list)
     foundation4: List[Card] = field(default_factory=list)
-    tableaus: List[List[Card]] = None
-    foundations: List[List[Card]] = None
+    tableaus: List[List[Card]] = field(default_factory=list)
+    foundations: List[List[Card]] = field(default_factory=list)
 
 
 DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
