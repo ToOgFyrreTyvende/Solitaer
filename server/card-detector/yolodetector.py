@@ -156,9 +156,9 @@ def extract_cards_from_image(img):
     bboxes = find_number_suit(processed_img, img)
     return create_stacks(bboxes, detections)
 
-
-if DEBUG:
+if __name__ == "__main__":
     img = cv2.resize(cv2.imread("cards5.jpg"), (1280,720))
     print(extract_cards_from_image(img))
     cv2.imshow("Image", img)
     cv2.waitKey(0)
+    
