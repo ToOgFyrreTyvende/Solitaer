@@ -150,17 +150,15 @@ def create_stacks(bboxes, detections):
         tableaus.append((A[0], cards))
     return [x[1] for x in sorted(tableaus, key=lambda x: x[0])]
 
-
+def extract_cards_from_image(img):
+    detections = infer_from_image(img)
+    processed_img = threshold_image(img)
+    bboxes = find_number_suit(processed_img, img)
+    return create_stacks(bboxes, detections)
 
 
 if DEBUG:
     img = cv2.resize(cv2.imread("cards5.jpg"), (1280,720))
-    
-    detections = infer_from_image(img)
-    processed_img = threshold_image(img)
-    #cv2.imshow("Image", processed_img)
-    bboxes = find_number_suit(processed_img, img)
-    tableaus = create_stacks(bboxes, detections)
-    print(tableaus)
+    print(extract_cards_from_image(img))
     cv2.imshow("Image", img)
     cv2.waitKey(0)
