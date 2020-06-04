@@ -17,7 +17,7 @@ def game_won(g: Klondike):
     return False    
 
 
-def new_find_move(g: Klondike) -> Union[int, Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]:
+def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]:
     """Finds a valid move in the given game
 
     Return value is dynamic, first int is a code:
@@ -35,7 +35,7 @@ def new_find_move(g: Klondike) -> Union[int, Tuple[int, int], Tuple[int, int, in
 
     # Draw cards if the pile is empty and there are cards in the stock
     if len(g.pile) == 0 and len(g.stock) != 0:
-        return -1
+        return -1,
 
     # Check tableaus for possible moves
     for from_id, from_tableau in enumerate(g.tableaus):
@@ -58,7 +58,7 @@ def new_find_move(g: Klondike) -> Union[int, Tuple[int, int], Tuple[int, int, in
             if check_move(g.pile[-1], tableau):
                 return 4, to_id  # code 4
 
-    return -1  # No other options matched, therefore draw
+    return -1,  # No other options matched, therefore draw
 
 
 def find_move(g: Klondike):
