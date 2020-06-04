@@ -1,48 +1,97 @@
-import unittest
+from functools import partial
+from typing import List, Dict, Tuple
+
+import pytest
+
 from logic import Card, build_game, draw, move, check_move, SUITS
 
+FlippedCard = partial(Card, flipped=True)
 
-_SUITS = {'h': SUITS[0], 'd': SUITS[1], 's': SUITS[2], 'c': SUITS[3]}
+# cards = {
+#     'h1': Card(1, SUITS['h']),
+#     'h2': Card(2, SUITS['h']),
+#     'h3': Card(3, SUITS['h']),
+#     'h4': Card(4, SUITS['h']),
+#     'h5': Card(5, SUITS['h']),
+#     'hk': Card(13, SUITS['h']),
+#     's1': Card(1, SUITS['s']),
+#     's2': Card(2, SUITS['s'])
+# }
+
+h1 = Card(1, SUITS['h'])
+h2 = Card(2, SUITS['h'])
+h3 = Card(3, SUITS['h'])
+h4 = Card(4, SUITS['h'])
+h5 = Card(5, SUITS['h'])
+hk = Card(13, SUITS['h'])
+s1 = Card(1, SUITS['s'])
+s2 = Card(2, SUITS['s'])
 
 
-class CardTest(unittest.TestCase):
+@pytest.mark.parametrize('card, expected', [
+    (Card(1, SUITS['h']), f" 1{SUITS['h']}"),
+    (Card(10, SUITS['d']), f"10{SUITS['d']}"),
+    (Card(13, SUITS['s']), f"13{SUITS['s']}"),
+    (Card(9, SUITS['c']), f" 9{SUITS['c']}")
+])
+def test_card_repr(card: Card, expected: str):
+    assert repr(card) == expected
 
-    def test_card_repr(self):
-        card = Card(1, 'h')
-        self.assertEqual(str(card), ' 1h')
+
+@pytest.mark.parametrize('exp_stock, exp_pile_len, exp_tableaus, exp_found_lens', [
+    (Card(1, SUITS['h'], True),
+     0,
+     [FlippedCard(7, SUITS['h']), Card(7, SUITS['d']), Card(7, SUITS['c']), Card(8, SUITS['s']), Card(9, SUITS['s']), Card(10, SUITS['c']), Card(12, SUITS['d'])],
+     0)
+])
+def test_build_game(exp_stock: Card, exp_pile_len: int, exp_tableaus: list, exp_found_lens: int):  # 'exp' short for 'expected'
+    game_no_shuffle = build_game(False)
+
+    assert game_no_shuffle.stock[0] == exp_stock
+    assert len(game_no_shuffle.pile) == exp_pile_len
+    for i, card in enumerate(exp_tableaus):
+        assert game_no_shuffle.tableaus[i][0] == card
+    for foundation in game_no_shuffle.foundations:
+        assert len(foundation) == exp_found_lens
+
+    assert isinstance(game_no_shuffle.stock, list)
+    assert isinstance(game_no_shuffle.pile, list)
+    assert isinstance(game_no_shuffle.tableaus, list)
+    assert isinstance(game_no_shuffle.foundations, list)
 
 
-class KlondikeTest(unittest.TestCase):
+@pytest.mark.parametrize('stock, pile, exp_lens', [
+    ([Card(1, 'h'), Card(2, 'h'), Card(3, 'h'), Card(4, 'h')], [Card(5, 'h')], {'stock': 1, 'pile': 4}),
+    ([Card(1, 'h'), Card(2, 'h')], [Card(3, 'h')], {'stock': 0, 'pile': 3}),
+    ([], [Card(1, 'h'), Card(2, 'h'), Card(3, 'h'), Card(4, 'h')], {'stock': 4, 'pile': 0})
+])
+def test_draw(stock: List[Card], pile: List[Card], exp_lens: Dict[str, int]):
+    _stock, _pile = draw(stock, pile, nb_cards=3)
 
-    def test_build_game(self):
-        pass
+    assert len(_stock) == exp_lens['stock']
+    assert len(_pile) == exp_lens['pile']
 
-    def test_draw(self):
-        stock = [Card(1, 'h'), Card(2, 'h'), Card(3, 'h'), Card(4, 'h')]
-        pile = [Card(5, 'h')]
-        _stock, _pile = draw(stock, pile)
-        self.assertEqual((len(stock), len(pile)), (len(_pile), len(_stock)))
 
-    def test_check_move(self):
-        h1 = Card(1, _SUITS['h'])
-        h2 = Card(2, _SUITS['h'])
-        hk = Card(13, _SUITS['h'])
-        s1 = Card(1, _SUITS['s'])
-        s2 = Card(2, _SUITS['s'])
-        self.assertTrue(check_move(h1, [s2]))
-        self.assertTrue(check_move(s1, [h2]))
-        self.assertFalse(check_move(h1, [s1]))
-        self.assertFalse(check_move(h1, [h2]))
-        self.assertTrue(check_move(h1, [], to_foundation=True))
-        self.assertTrue(check_move(h2, [h1], to_foundation=True))
-        self.assertTrue(check_move(hk, []))
+@pytest.mark.parametrize('card_from, card_to, to_foundation, expected', [
+    (h1, [s2], False, True),
+    (s1, [h2], False, True),
+    (h1, [s1], False, False),
+    (h1, [h2], False, False),
+    (h2, [h1], True, True),
+    (h1, [], True, True),
+    (hk, [], False, True)
+])
+def test_check_move(card_from: Card, card_to: List[Card], to_foundation: bool, expected: bool):
+    assert check_move(card_from, card_to, to_foundation=to_foundation) == expected
 
-    def test_move(self):
-        tableau1 = [Card(1, 'h'), Card(2, 'h'), Card(3, 'h'), Card(4, 'h')]
-        tableau2 = [Card(5, 'h')]
 
-        self.assertTupleEqual(move(1, tableau1, tableau2), (tableau1[:3], [Card(5, 'h'), Card(4, 'h')]))
+@pytest.mark.parametrize('card_pos, pile_from, pile_to, expected', [
+    (1, [h1, h2, h3, h4], [h5], ([h1, h2, h3], [h5, h4])),
+    (1, [s2, h1], [], ([s2], [h1]))
+])
+def test_move(card_pos: int, pile_from: List[Card], pile_to: List[Card], expected: Tuple[List[Card], List[Card]]):
+    assert expected == move(card_pos, pile_from, pile_to)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()
