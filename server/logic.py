@@ -7,8 +7,10 @@ from typing import List, Tuple
 
 # Constants
 # SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
-SUITS = ['h', 'd', 's', 'c']
-#SUITS = ['♡', '♢', '♠', '♣']
+# SUITS = ['h', 'd', 's', 'c']
+# SUITS = ['♡', '♢', '♠', '♣']
+# SUITS = {'h': '♡', 'd': '♢', 's': '♠', 'c': '♣'}
+SUITS = {'h': 'h', 'd': 'd', 's': 's', 'c': 'c'}
 
 
 @dataclass
@@ -19,7 +21,7 @@ class Card:
 
     @property
     def is_black(self):
-        return self.suit in SUITS[2:]
+        return self.suit in list(SUITS.values())[2:]
 
     def __repr__(self):
         """Card representation"""
@@ -55,11 +57,11 @@ class Klondike:
     foundations: List[List[Card]] = field(default_factory=list)
 
 
-DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
 
 
 def build_game(shuffle: bool = True) -> Klondike:
-    _deck = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+    _deck = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
     if shuffle: random.shuffle(_deck)
     game = Klondike()
     game.stock = _deck[:24]
