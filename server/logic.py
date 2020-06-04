@@ -146,3 +146,17 @@ def print_game(game: Klondike) -> None:
         elif i == 6:
             left = '|###|' if len(game.stock) > 0 else '|   |'
         print(f'{left}\t{right}')
+
+
+def cheat_print_game(game: Klondike) -> None:
+    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
+        left = _foundation_str(foundation) if foundation is not None else '     '
+        _right_str = ''
+        for card in tableau:
+            _right_str += f'|{card}'
+        right = _right_str + '|'
+        if i == 5 and len(game.pile) != 0:
+            left = f'|{game.pile[-1]}|'
+        elif i == 6:
+            left = '|###|' if len(game.stock) > 0 else '|   |'
+        print(f'{left}\t{right}')
