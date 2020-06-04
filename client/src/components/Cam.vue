@@ -205,7 +205,7 @@ export default {
       devices: [],
       return_img: null,
       show_side_menu: false,
-      show_overlay: true,
+      show_overlay: false,
       cards: ""
     };
   },
