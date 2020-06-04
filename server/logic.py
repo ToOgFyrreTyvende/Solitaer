@@ -7,8 +7,10 @@ from typing import List, Tuple
 
 # Constants
 # SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
-SUITS = ['h', 'd', 's', 'c']
-#SUITS = ['♡', '♢', '♠', '♣']
+# SUITS = ['h', 'd', 's', 'c']
+# SUITS = ['♡', '♢', '♠', '♣']
+# SUITS = {'h': '♡', 'd': '♢', 's': '♠', 'c': '♣'}
+SUITS = {'h': 'h', 'd': 'd', 's': 's', 'c': 'c'}
 
 
 @dataclass
@@ -19,7 +21,7 @@ class Card:
 
     @property
     def is_black(self):
-        return self.suit in SUITS[2:]
+        return self.suit in list(SUITS.values())[2:]
 
     def __repr__(self):
         """Card representation"""
@@ -55,11 +57,11 @@ class Klondike:
     foundations: List[List[Card]] = field(default_factory=list)
 
 
-DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
 
 
 def build_game(shuffle: bool = True) -> Klondike:
-    _deck = [Card(value, suit) for value in range(1, 14) for suit in SUITS]
+    _deck = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
     if shuffle: random.shuffle(_deck)
     game = Klondike()
     game.stock = _deck[:24]
@@ -139,6 +141,20 @@ def print_game(game: Klondike) -> None:
     for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
+        if i == 5 and len(game.pile) != 0:
+            left = f'|{game.pile[-1]}|'
+        elif i == 6:
+            left = '|###|' if len(game.stock) > 0 else '|   |'
+        print(f'{left}\t{right}')
+
+
+def cheat_print_game(game: Klondike) -> None:
+    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
+        left = _foundation_str(foundation) if foundation is not None else '     '
+        _right_str = ''
+        for card in tableau:
+            _right_str += f'|{card}'
+        right = _right_str + '|'
         if i == 5 and len(game.pile) != 0:
             left = f'|{game.pile[-1]}|'
         elif i == 6:
