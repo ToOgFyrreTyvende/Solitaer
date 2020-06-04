@@ -1,23 +1,23 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Books from './components/Books.vue';
-import Ping from './components/Ping.vue';
+import Cam from './components/Cam.vue';
 
 Vue.use(Router);
 
 export default new Router({
   mode: 'history',
-  base: process.env.BASE_URL,
+  base: '/soli/',
   routes: [
     {
       path: '/',
-      name: 'Books',
-      component: Books,
+      name: 'Cam',
+      component: Cam,
     },
     {
-      path: '/ping',
-      name: 'Ping',
-      component: Ping,
+      path: '/books',
+      name: 'Books',
+      component: Books,
     },
   ],
 });

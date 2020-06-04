@@ -9,7 +9,7 @@ CONFIDENCE_CUTOFF = 0.3
 CLASS_IDS = []
 
 dirname = os.path.dirname(__file__)
-weights = os.path.join(dirname, "yolocards_608.weights")
+weights = os.path.join(dirname, "yolocards_final.weights")
 names = os.path.join(dirname, "cards.names")
 cfg = os.path.join(dirname, "cards.cfg")
 # load neural network from YOLO weights and config
@@ -77,7 +77,7 @@ def draw_cards(img, detections):
         [x, y, w, h] = pos
         label = str(CLASS_IDS[class_id])
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.putText(img, label, (x, y + 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 0), 3)
+        cv2.putText(img, label, (x, y + 30), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 3)
 
 
 def infer_from_image(raw_img):
@@ -171,10 +171,18 @@ def extract_cards_from_image(img):
     detections = infer_from_image(img)
     processed_img = threshold_image(img)
     bboxes = find_number_suit(processed_img, img)
-    return create_stacks(bboxes, detections)
+    return detections
+
+def get_card_classes(detections):
+    res = []
+    for class_id, confidence, pos in detections:
+        label = str(CLASS_IDS[class_id])
+        res.append(label)
+    return res
+
 
 if __name__ == "__main__":
-    img = cv2.resize(cv2.imread("cards5.jpg"), (1280,720))
+    img = cv2.resize(cv2.imread("cards4.jpg"), (1280,720))
     print(extract_cards_from_image(img))
     cv2.imshow("Image", img)
     cv2.waitKey(0)

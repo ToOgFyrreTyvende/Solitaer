@@ -1,6 +1,10 @@
 import uuid
+import numpy as np
+import cv2
+import base64
+from card_detector.yolodetector import extract_cards_from_image, get_card_classes
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 
 
@@ -49,6 +53,17 @@ def remove_book(book_id):
 def ping_pong():
     return jsonify('pong!')
 
+@app.route('/boardAnalyse', methods=['POST'])
+def boardAnalyse():
+    img_data = request.json['data'][23:]
+    np_arr = np.fromstring(base64.b64decode(img_data), np.uint8)
+    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    detections = extract_cards_from_image(img)
+    retval, buffer = cv2.imencode('.jpeg', img)
+    jpg_as_text = base64.b64encode(buffer).decode('utf-8') 
+    json = {'cards': get_card_classes(detections), 'img_data': jpg_as_text}
+    return jsonify(json)
+    
 
 @app.route('/books', methods=['GET', 'POST'])
 def all_books():
