@@ -3,7 +3,7 @@ from typing import Union, Tuple
 
 import pytest
 
-from ai import new_find_move
+from ai import new_find_move, MOVE_CODE
 from logic import build_game, draw, move, Klondike
 
 
@@ -50,11 +50,11 @@ game_after_draw, g_move4, g_move3, g_move1 = build_test_games()
 
 
 @pytest.mark.parametrize('game, expected', [
-    (build_game(), (-1,)),
-    (game_after_draw, (2, 1, 2, 1)),
-    (g_move4, (4, 2)),
-    (g_move3, (3, 0)),
-    (g_move1, (1, 2, 1))
+    (build_game(), (MOVE_CODE.DRAW,)),
+    (game_after_draw, (MOVE_CODE.T_TO_T, 1, 2, 1)),
+    (g_move4, (MOVE_CODE.P_TO_T, 2)),
+    (g_move3, (MOVE_CODE.P_TO_F, 0)),
+    (g_move1, (MOVE_CODE.T_TO_F, 2, 1))
 ])
 def test_new_find_move(game: Klondike, expected: Union[int, Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]):
     assert new_find_move(game) == expected

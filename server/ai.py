@@ -1,6 +1,16 @@
 from typing import List, Tuple, Union
+from enum import IntEnum
 
 from logic import build_game, print_game, move, draw, Klondike, check_move, Card
+
+
+class MOVE_CODE(IntEnum):
+    ERROR:  int = -1
+    DRAW:   int = 0
+    T_TO_F: int = 1
+    T_TO_T: int = 2
+    P_TO_F: int = 3
+    P_TO_T: int = 4
 
 
 def get_nr_of_flipped(tableau: List[Card]) -> int:
@@ -14,51 +24,54 @@ def get_nr_of_flipped(tableau: List[Card]) -> int:
 def game_won(g: Klondike):
     if len(g.foundations[0]) == 13 and len(g.foundations[1]) == 13 and len(g.foundations[2]) == 13 and len(g.foundations[3]) == 13:
         return True
-    return False    
+    return False
 
 
 def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]:
     """Finds a valid move in the given game
 
     Return value is dynamic, first int is a code:
-    -1: draw
+     0: draw
      1: tableau -> foundation => (code, tableau_id   , foundation_id)
      2: tableau -> tableau    => (code, tableau_id   , tableau_id   , number of cards)
      3: pile    -> foundation => (code, foundation_id)
      4: pile    -> tableau    => (code, tableau_id)
+    -1: Error, no valid moved found :(
 
     If a valid move exists, it returns an int and two card piles.
     The int specifies the index from the first list to move to the other list
-    If no valid move is found, it returns an integer only:
-    -1 means you should draw from the pile
+    If no valid move is found, it returns a tuple with the error code (int): -1
     """
 
     # Draw cards if the pile is empty and there are cards in the stock
     if len(g.pile) == 0 and len(g.stock) != 0:
-        return -1,
+        return MOVE_CODE.DRAW,
 
     # Check tableaus for possible moves
     for from_id, from_tableau in enumerate(g.tableaus):
         if len(from_tableau) == 0: continue  # Skip
         for f_id, foundation in enumerate(g.foundations):
             if check_move(from_tableau[-1], foundation, to_foundation=True):
-                return 1, from_id, f_id  # code 1
+                return MOVE_CODE.T_TO_F, from_id, f_id  # code 1
         for to_id, to_tableau in enumerate(g.tableaus):
             nb_flipped = get_nr_of_flipped(from_tableau)
             if from_tableau[-nb_flipped] == from_tableau[0] and from_tableau[0].value == 13: continue
             if check_move(from_tableau[-nb_flipped], to_tableau):
-                return 2, from_id, to_id, nb_flipped  # code 2
+                return MOVE_CODE.T_TO_T, from_id, to_id, nb_flipped  # code 2
 
     # Check pile for possible moves
     if len(g.pile):
         for f_id, foundation in enumerate(g.foundations):
             if check_move(g.pile[-1], foundation, to_foundation=True):
-                return 3, f_id  # code 3
+                return MOVE_CODE.P_TO_F, f_id  # code 3
         for to_id, tableau in enumerate(g.tableaus):
             if check_move(g.pile[-1], tableau):
-                return 4, to_id  # code 4
+                return MOVE_CODE.P_TO_T, to_id  # code 4
 
-    return -1,  # No other options matched, therefore draw
+    if len(g.pile) + len(g.stock) > 1:
+        return MOVE_CODE.DRAW,
+
+    return MOVE_CODE.ERROR,  # No other options matched, give up
 
 
 def find_move(g: Klondike):
