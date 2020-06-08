@@ -69,14 +69,14 @@ def find_move(g: Klondike):
         g.stock, g.pile = draw(g.stock, g.pile)
         # print_game(g)
     if len(g.pile) != 0:
-        for f in range(4): # looks through different foundations 
+        for f in range(4):  # looks through different foundations 
             if check_move(g.pile[-1], g.foundations[f], to_foundation = True):
                 g.pile, g.foundations[f] = move(1, g.pile, g.foundations[f])
                 return
         for j in range(len(g.tableaus)):  # looks through different tableaus
             # if len(g.tableaus[j]) == 0:
             #       print("Skip " + str(j+1))
-            #        continue 
+            #       continue
             if check_move(g.pile[-1], g.tableaus[j]):
                 g.pile, g.tableaus[j] = move(1, g.pile, g.tableaus[j])
                 print("Match in tableau " + str(j+1) + " Move " + str(1) + " 0 " + str(j+1))
@@ -89,7 +89,7 @@ def find_move(g: Klondike):
         if len(g.tableaus[i]) == 0:
             #print(" Skip" + str(i+1))
             continue
-        for f in range(4): # looks through different foundations 
+        for f in range(4):  # looks through different foundations 
             if check_move(g.tableaus[i][-1], g.foundations[f], to_foundation = True):
                 g.tableaus[i], g.foundations[f] = move(1, g.tableaus[i], g.foundations[f])
                 return
