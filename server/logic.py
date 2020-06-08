@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from itertools import zip_longest
 from typing import List, Tuple
 
+from dataclasses_json import dataclass_json
+
 # Constants
 # SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
 # SUITS = ['h', 'd', 's', 'c']
@@ -13,6 +15,7 @@ from typing import List, Tuple
 SUITS = {'h': 'h', 'd': 'd', 's': 's', 'c': 'c'}
 
 
+@dataclass_json
 @dataclass
 class Card:
     value: int
@@ -38,21 +41,11 @@ class Card:
             return Card(value=int(string[0]), suit=string[-1], flipped = True)
 
 
+@dataclass_json
 @dataclass
 class Klondike:
     stock: List[Card] = field(default_factory=list)
     pile: List[Card] = field(default_factory=list)
-    tableau1: List[Card] = field(default_factory=list)
-    tableau2: List[Card] = field(default_factory=list)
-    tableau3: List[Card] = field(default_factory=list)
-    tableau4: List[Card] = field(default_factory=list)
-    tableau5: List[Card] = field(default_factory=list)
-    tableau6: List[Card] = field(default_factory=list)
-    tableau7: List[Card] = field(default_factory=list)
-    foundation1: List[Card] = field(default_factory=list)
-    foundation2: List[Card] = field(default_factory=list)
-    foundation3: List[Card] = field(default_factory=list)
-    foundation4: List[Card] = field(default_factory=list)
     tableaus: List[List[Card]] = field(default_factory=list)
     foundations: List[List[Card]] = field(default_factory=list)
 
@@ -68,16 +61,17 @@ def build_game(shuffle: bool = True) -> Klondike:
     for card in game.stock: card.flipped = True
     game.pile = []
 
-    game.tableau1 = _deck[24:25]; game.tableau1[-1].flipped = True
-    game.tableau2 = _deck[25:27]; game.tableau2[-1].flipped = True
-    game.tableau3 = _deck[27:30]; game.tableau3[-1].flipped = True
-    game.tableau4 = _deck[30:34]; game.tableau4[-1].flipped = True
-    game.tableau5 = _deck[34:39]; game.tableau5[-1].flipped = True
-    game.tableau6 = _deck[39:45]; game.tableau6[-1].flipped = True
-    game.tableau7 = _deck[45:52]; game.tableau7[-1].flipped = True
+    game.tableaus.append(_deck[24:25]); game.tableaus[0][-1].flipped = True
+    game.tableaus.append(_deck[25:27]); game.tableaus[1][-1].flipped = True
+    game.tableaus.append(_deck[27:30]); game.tableaus[2][-1].flipped = True
+    game.tableaus.append(_deck[30:34]); game.tableaus[3][-1].flipped = True
+    game.tableaus.append(_deck[34:39]); game.tableaus[4][-1].flipped = True
+    game.tableaus.append(_deck[39:45]); game.tableaus[5][-1].flipped = True
+    game.tableaus.append(_deck[45:52]); game.tableaus[6][-1].flipped = True
 
-    game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
-    game.tableaus = [game.tableau1, game.tableau2, game.tableau3, game.tableau4, game.tableau5, game.tableau6, game.tableau7]
+    game.foundations = [[], [], [], []]
+    # game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
+    # game.tableaus = [game.tableau1, game.tableau2, game.tableau3, game.tableau4, game.tableau5, game.tableau6, game.tableau7]
 
     return game
 
