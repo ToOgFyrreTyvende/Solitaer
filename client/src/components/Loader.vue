@@ -1,3 +1,4 @@
+<!-- https://codepen.io/zFunx/pen/bRqRmJ -->
 <template>
   <div class="backdrop">
     <div class="swirl" v-bind:class="styleType[type]">

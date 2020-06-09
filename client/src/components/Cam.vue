@@ -25,17 +25,13 @@
       </select>
     </div>
 
-    <div ref="flashing_bg" class="flashing-bg"></div>
-
-    <div id="overlay" v-show="show_overlay">
-      <button type="button" class="close" @click="hideScreenElements()">&times;</button>
-
-      <h4>Response:</h4>
-      <img class="fit-img" v-bind:src="return_img" v-show="return_img != null" />
+    <b-modal ref="modal" id="modal" size="xl" title="Response" hide-footer hide-backdrop>
+      <img class="img-fluid" v-bind:src="return_img" v-show="return_img != null" />
       <br />
       {{cards}}
-    </div>
+    </b-modal>
 
+    <div ref="flashing_bg" class="flashing-bg"></div>
     <vue-web-cam
       id="cam"
       ref="webcam"
@@ -152,29 +148,6 @@
   height: 100%;
 }
 
-#overlay {
-  z-index: 3;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
-  margin: 1rem;
-  background-color: #f8f8ff;
-  border-radius: 15px;
-  padding: 1rem;
-}
-.close {
-  position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
-  font-size: 2rem;
-}
-.fit-img {
-  max-width: 95%;
-  margin: 0 auto;
-}
-
 #take-picture {
   z-index: 2;
   position: fixed;
@@ -224,7 +197,7 @@ export default {
       loading: false,
       return_img: null,
       show_side_menu: false,
-      show_overlay: false,
+      show_modal: true,
       cards: ""
     };
   },
@@ -253,7 +226,7 @@ export default {
     },
     hideScreenElements() {
       if (this.show_side_menu) this.show_side_menu = false;
-      if (this.show_overlay) this.show_overlay = false;
+      if (this.show_modal) this.show_modal = false;
     },
     getMessage() {
       const path = "http://localhost:5000/ping";
@@ -311,8 +284,8 @@ export default {
         .then(({ data }) => {
           _this.return_img = "data:image/png;base64," + data.img_data;
           _this.stopLoading();
-          _this.show_overlay = true;
           _this.cards = data.cards;
+          _this.$refs.modal.show();
         })
         .catch(error => {
           console.log(error);
