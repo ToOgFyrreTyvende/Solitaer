@@ -126,13 +126,28 @@ def find_move(g: Klondike):
 def main():
     g = build_game(False)
     print_game(g); print()
-    g.stock, g.pile = draw(g.stock, g.pile)
-    print_game(g); print()
+    game_state = 'Won'
 
     while not game_won(g):
-        find_move(g)
+        code, *instr = new_find_move(g)
+        print(f'Code: {code!s}, instr: {instr}')
+        if code == MOVE_CODE.DRAW:
+            g.stock, g.pile = draw(g.stock, g.pile)
+        elif code == MOVE_CODE.T_TO_F:
+            g.tableaus[instr[0]], g.foundations[instr[1]] = move(1, g.tableaus[instr[0]], g.foundations[instr[1]])
+        elif code == MOVE_CODE.T_TO_T:
+            g.tableaus[instr[0]], g.tableaus[instr[1]] = move(instr[2], g.tableaus[instr[0]], g.tableaus[instr[1]])
+        elif code == MOVE_CODE.P_TO_F:
+            g.pile, g.foundations[instr[0]] = move(1, g.pile, g.foundations[instr[0]])
+        elif code == MOVE_CODE.P_TO_T:
+            g.pile, g.tableaus[instr[0]] = move(1, g.pile, g.tableaus[instr[0]])
+        elif code == MOVE_CODE.ERROR:
+            print('Cannot find any valid moves!')
+            game_state = 'Over'
+            break
         print_game(g)
-    print("Game Won !!!")
+        print()
+    print(f'Game {game_state}')
 
 
 if __name__ == "__main__":
