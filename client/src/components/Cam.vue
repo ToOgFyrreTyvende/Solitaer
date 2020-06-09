@@ -23,6 +23,8 @@
       </select>
     </div>
 
+    <div ref="flashing_bg" class="flashing-bg"></div>
+
     <div id="overlay" v-show="show_overlay">
       <button type="button" class="close" @click="hideScreenElements()">&times;</button>
 
@@ -38,7 +40,7 @@
       :device-id="deviceId"
       width="100%"
       height="100%"
-      v-bind:resolution="{height: 2160, width: 4096}"
+      v-bind:resolution="{height: 720, width: 1080}"
       @click.native="hideScreenElements()"
       @started="onStarted"
       @stopped="onStopped"
@@ -57,6 +59,45 @@
   width: 100vw;
   height: 100vh;
 }
+
+.flashing-bg {
+  z-index: 1;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.flash-bg {
+  -webkit-animation: flash-bg 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
+  animation: flash-bg 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
+  background: #f8f8ff;
+}
+
+@-webkit-keyframes flash-bg {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes flash-bg {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .menuToggleContainer {
   position: fixed;
   top: 1rem;
@@ -155,10 +196,11 @@
 }
 
 #take-picture {
+  z-index: 2;
   position: fixed;
   bottom: 35px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 50%;
+  transform: translateX(50%);
 
   display: block;
   border-radius: 50%;
@@ -180,9 +222,10 @@
   justify-content: center;
 }
 
-@media screen and (orientation: landscape) {
-  #overlay {
-    bottom: 15px;
+@media only screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
+  #take-picture {
+    bottom: 20px;
+    right: 52.5px;
   }
 }
 </style>
@@ -266,10 +309,12 @@ export default {
       this.img = this.$refs.webcam.capture();
     },
     analyzePicture() {
+      this.$refs.flashing_bg.classList.remove("flash-bg");
+      this.$refs.flashing_bg.classList.add("flash-bg");
       this.sendPicture();
       let _this = this;
       axios
-        .post("http://127.0.0.1:5000/boardAnalyse", { data: this.img })
+        .post("https://lambda.wtf/so/boardAnalyse", { data: this.img })
         .then(({ data }) => {
           _this.return_img = "data:image/png;base64," + data.img_data;
           _this.show_overlay = true;
