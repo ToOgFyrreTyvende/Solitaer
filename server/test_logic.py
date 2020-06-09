@@ -3,7 +3,7 @@ from typing import List, Dict, Tuple
 
 import pytest
 
-from logic import Card, build_game, draw, move, check_move, SUITS
+from logic import Card, Klondike, draw, move, check_move, SUITS
 
 FlippedCard = partial(Card, flipped=True)
 
@@ -45,7 +45,7 @@ def test_card_repr(card: Card, expected: str):
      0)
 ])
 def test_build_game(exp_stock: Card, exp_pile_len: int, exp_tableaus: list, exp_found_lens: int):  # 'exp' short for 'expected'
-    game_no_shuffle = build_game(False)
+    game_no_shuffle = Klondike.new_game(False)
 
     assert game_no_shuffle.stock[0] == exp_stock
     assert len(game_no_shuffle.pile) == exp_pile_len

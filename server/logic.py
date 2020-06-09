@@ -49,31 +49,29 @@ class Klondike:
     tableaus: List[List[Card]] = field(default_factory=list)
     foundations: List[List[Card]] = field(default_factory=list)
 
+    @staticmethod
+    def new_game(shuffle: bool = True) -> Klondike:
+        deck = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
+        if shuffle: random.shuffle(deck)
+        game = Klondike()
+        game.stock = deck[:24]
+        for card in game.stock: card.flipped = True
+        game.pile = []
+
+        game.tableaus.append(deck[24:25]); game.tableaus[0][-1].flipped = True
+        game.tableaus.append(deck[25:27]); game.tableaus[1][-1].flipped = True
+        game.tableaus.append(deck[27:30]); game.tableaus[2][-1].flipped = True
+        game.tableaus.append(deck[30:34]); game.tableaus[3][-1].flipped = True
+        game.tableaus.append(deck[34:39]); game.tableaus[4][-1].flipped = True
+        game.tableaus.append(deck[39:45]); game.tableaus[5][-1].flipped = True
+        game.tableaus.append(deck[45:52]); game.tableaus[6][-1].flipped = True
+
+        game.foundations = [[], [], [], []]
+
+        return game
+
 
 DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
-
-
-def build_game(shuffle: bool = True) -> Klondike:
-    _deck = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
-    if shuffle: random.shuffle(_deck)
-    game = Klondike()
-    game.stock = _deck[:24]
-    for card in game.stock: card.flipped = True
-    game.pile = []
-
-    game.tableaus.append(_deck[24:25]); game.tableaus[0][-1].flipped = True
-    game.tableaus.append(_deck[25:27]); game.tableaus[1][-1].flipped = True
-    game.tableaus.append(_deck[27:30]); game.tableaus[2][-1].flipped = True
-    game.tableaus.append(_deck[30:34]); game.tableaus[3][-1].flipped = True
-    game.tableaus.append(_deck[34:39]); game.tableaus[4][-1].flipped = True
-    game.tableaus.append(_deck[39:45]); game.tableaus[5][-1].flipped = True
-    game.tableaus.append(_deck[45:52]); game.tableaus[6][-1].flipped = True
-
-    game.foundations = [[], [], [], []]
-    # game.foundations = [game.foundation1, game.foundation2, game.foundation3, game.foundation4]
-    # game.tableaus = [game.tableau1, game.tableau2, game.tableau3, game.tableau4, game.tableau5, game.tableau6, game.tableau7]
-
-    return game
 
 
 def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[Card], List[Card]]:
