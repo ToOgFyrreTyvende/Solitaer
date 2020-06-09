@@ -60,6 +60,25 @@ def test_build_game(exp_stock: Card, exp_pile_len: int, exp_tableaus: list, exp_
     assert isinstance(game_no_shuffle.foundations, list)
 
 
+@pytest.mark.parametrize('exp_stock_len, exp_pile_len, exp_tableau_lens, exp_found_lens', [
+    (24, 0, list(range(1, 8)), 0)
+])
+def test_klondike_new_game(exp_stock_len: int, exp_pile_len: int, exp_tableau_lens: List[int], exp_found_lens: int):  # 'exp' short for 'expected'
+    game_no_shuffle = Klondike.new_game(False)
+
+    assert len(game_no_shuffle.stock) == exp_stock_len
+    assert len(game_no_shuffle.pile) == exp_pile_len
+    for i, tableau in enumerate(game_no_shuffle.tableaus):
+        assert len(tableau) == exp_tableau_lens[i]
+    for foundation in game_no_shuffle.foundations:
+        assert len(foundation) == exp_found_lens
+
+    assert isinstance(game_no_shuffle.stock, list)
+    assert isinstance(game_no_shuffle.pile, list)
+    assert isinstance(game_no_shuffle.tableaus, list)
+    assert isinstance(game_no_shuffle.foundations, list)
+
+
 @pytest.mark.parametrize('stock, pile, exp_lens', [
     ([Card(1, 'h'), Card(2, 'h'), Card(3, 'h'), Card(4, 'h')], [Card(5, 'h')], {'stock': 1, 'pile': 4}),
     ([Card(1, 'h'), Card(2, 'h')], [Card(3, 'h')], {'stock': 0, 'pile': 3}),
