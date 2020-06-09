@@ -132,7 +132,7 @@ def _tableau_str(tableau: List[Card]) -> str:
 
 
 def print_game(game: Klondike) -> None:
-    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
+    for i, (foundation, tableau) in enumerate(zip_longest(reversed(game.foundations), reversed(game.tableaus))):
         left = _foundation_str(foundation) if foundation is not None else '     '
         right = _tableau_str(tableau)
         if i == 5 and len(game.pile) != 0:
@@ -143,7 +143,7 @@ def print_game(game: Klondike) -> None:
 
 
 def cheat_print_game(game: Klondike) -> None:
-    for i, (foundation, tableau) in enumerate(zip_longest(game.foundations, reversed(game.tableaus))):
+    for i, (foundation, tableau) in enumerate(zip_longest(reversed(game.foundations), reversed(game.tableaus))):
         left = _foundation_str(foundation) if foundation is not None else '     '
         _right_str = ''
         for card in tableau:
