@@ -37,7 +37,7 @@
       :device-id="deviceId"
       width="100%"
       height="100%"
-      v-bind:resolution="{height: 720, width: 1080}"
+      v-bind:resolution="{height: 720, width: 1280}"
       @click.native="hideScreenElements()"
       @started="onStarted"
       @stopped="onStopped"
