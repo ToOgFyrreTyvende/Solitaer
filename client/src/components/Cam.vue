@@ -31,7 +31,6 @@
       {{cards}}
     </b-modal>
 
-    <div ref="flashing_bg" class="flashing-bg"></div>
     <vue-web-cam
       id="cam"
       ref="webcam"
@@ -46,6 +45,8 @@
       @cameras="onCameras"
       @camera-change="onCameraChange"
     />
+    <div ref="flashing_bg" class="flashing-bg"></div>
+
     <button
       ref="take_picture"
       id="take-picture"
@@ -66,6 +67,7 @@
 }
 
 .flashing-bg {
+  pointer-events: none;
   z-index: 1;
   position: fixed;
   width: 100%;
@@ -197,7 +199,6 @@ export default {
       loading: false,
       return_img: null,
       show_side_menu: false,
-      show_modal: true,
       cards: ""
     };
   },
@@ -226,7 +227,6 @@ export default {
     },
     hideScreenElements() {
       if (this.show_side_menu) this.show_side_menu = false;
-      if (this.show_modal) this.show_modal = false;
     },
     getMessage() {
       const path = "http://localhost:5000/ping";
