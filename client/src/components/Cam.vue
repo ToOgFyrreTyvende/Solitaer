@@ -1,5 +1,7 @@
 <template>
   <div class="container">
+    <loader v-show="loading" type="1"></loader>
+
     <div
       class="menuToggleContainer"
       v-bind:class="{change: show_side_menu}"
@@ -48,11 +50,18 @@
       @cameras="onCameras"
       @camera-change="onCameraChange"
     />
-    <button id="take-picture" v-bind:class="{change: show_side_menu}" @click="analyzePicture()"></button>
+    <button
+      ref="take_picture"
+      id="take-picture"
+      v-bind:class="{change: show_side_menu}"
+      @click="analyzePicture()"
+    ></button>
   </div>
 </template>
 
 <style>
+@import "../assets/styles/animations.css";
+
 .container {
   padding: 0;
   margin: 0;
@@ -67,35 +76,6 @@
   height: 100%;
   top: 0;
   left: 0;
-}
-
-.flash-bg {
-  -webkit-animation: flash-bg 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
-  animation: flash-bg 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
-  background: #f8f8ff;
-}
-
-@-webkit-keyframes flash-bg {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-@keyframes flash-bg {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
 }
 
 .menuToggleContainer {
@@ -199,7 +179,7 @@
   z-index: 2;
   position: fixed;
   bottom: 35px;
-  right: 50%;
+  right: 72.5px;
   transform: translateX(50%);
 
   display: block;
@@ -221,24 +201,19 @@
   flex-direction: row;
   justify-content: center;
 }
-
-@media only screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
-  #take-picture {
-    bottom: 20px;
-    right: 52.5px;
-  }
-}
 </style>
 
 
 <script>
 import axios from "axios";
 import { WebCam } from "vue-web-cam";
+import Loader from "./Loader.vue";
 
 export default {
   name: "Cam",
   components: {
-    "vue-web-cam": WebCam
+    "vue-web-cam": WebCam,
+    loader: Loader
   },
   data() {
     return {
@@ -246,6 +221,7 @@ export default {
       camera: null,
       deviceId: null,
       devices: [],
+      loading: false,
       return_img: null,
       show_side_menu: false,
       show_overlay: false,
@@ -308,15 +284,33 @@ export default {
     sendPicture() {
       this.img = this.$refs.webcam.capture();
     },
-    analyzePicture() {
+    flashAndFade() {
       this.$refs.flashing_bg.classList.remove("flash-bg");
       this.$refs.flashing_bg.classList.add("flash-bg");
+
+      this.$refs.take_picture.classList.remove("fade-out");
+      this.$refs.take_picture.classList.add("fade-out");
+    },
+    stopLoading() {
+      this.$refs.flashing_bg.classList.remove("flash-bg");
+      this.$refs.take_picture.classList.remove("fade-out");
+
+      this.loading = false;
+    },
+    analyzePicture() {
+      this.flashAndFade();
+
+      setTimeout(() => {
+        this.loading = true;
+      }, 310);
+
       this.sendPicture();
       let _this = this;
       axios
         .post("https://lambda.wtf/so/boardAnalyse", { data: this.img })
         .then(({ data }) => {
           _this.return_img = "data:image/png;base64," + data.img_data;
+          _this.stopLoading();
           _this.show_overlay = true;
           _this.cards = data.cards;
         })

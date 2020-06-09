@@ -1,0 +1,51 @@
+.flash-bg {
+    -webkit-animation: flash-bg 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
+    animation: flash-bg 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
+    background: #f8f8ff;
+  }
+  
+  @-webkit-keyframes flash-bg {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes flash-bg {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  
+  .fade-out {
+    -webkit-animation: fade-out 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
+    animation: fade-out 310ms cubic-bezier(0.25, 0.61, 0.355, 1) forwards;
+    opacity: 0;
+  }
+  
+  @-webkit-keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }

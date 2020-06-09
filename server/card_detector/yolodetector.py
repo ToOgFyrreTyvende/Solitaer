@@ -65,6 +65,9 @@ def clean_detections(detections):
     # We need to run the data through non maximum suppression.
     # This removes boxes around the same detection.
     (bounding_boxes, confidence_scores, detected_classes) = detections
+    if not bounding_boxes:
+        return []
+        
     indices = cv2.dnn.NMSBoxes(bounding_boxes, confidence_scores, CONFIDENCE_CUTOFF, 0.4).flatten()
 
     # This will result in array of form 
