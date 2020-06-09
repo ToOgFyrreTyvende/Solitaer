@@ -1,7 +1,7 @@
 from typing import List, Tuple, Union
 from enum import IntEnum
 
-from logic import build_game, print_game, move, draw, Klondike, check_move, Card
+from logic import print_game, move, draw, Klondike, check_move, Card
 
 
 class MOVE_CODE(IntEnum):
@@ -124,7 +124,7 @@ def find_move(g: Klondike):
 
 
 def main():
-    g = build_game(False)
+    g = Klondike.new_game(False)
     print_game(g); print()
     game_state = 'Won'
 

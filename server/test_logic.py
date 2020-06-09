@@ -3,7 +3,7 @@ from typing import List, Dict, Tuple
 
 import pytest
 
-from logic import Card, build_game, draw, move, check_move, SUITS
+from logic import Card, Klondike, draw, move, check_move, SUITS
 
 FlippedCard = partial(Card, flipped=True)
 
@@ -45,12 +45,31 @@ def test_card_repr(card: Card, expected: str):
      0)
 ])
 def test_build_game(exp_stock: Card, exp_pile_len: int, exp_tableaus: list, exp_found_lens: int):  # 'exp' short for 'expected'
-    game_no_shuffle = build_game(False)
+    game_no_shuffle = Klondike.new_game(False)
 
     assert game_no_shuffle.stock[0] == exp_stock
     assert len(game_no_shuffle.pile) == exp_pile_len
     for i, card in enumerate(exp_tableaus):
         assert game_no_shuffle.tableaus[i][0] == card
+    for foundation in game_no_shuffle.foundations:
+        assert len(foundation) == exp_found_lens
+
+    assert isinstance(game_no_shuffle.stock, list)
+    assert isinstance(game_no_shuffle.pile, list)
+    assert isinstance(game_no_shuffle.tableaus, list)
+    assert isinstance(game_no_shuffle.foundations, list)
+
+
+@pytest.mark.parametrize('exp_stock_len, exp_pile_len, exp_tableau_lens, exp_found_lens', [
+    (24, 0, list(range(1, 8)), 0)
+])
+def test_klondike_new_game(exp_stock_len: int, exp_pile_len: int, exp_tableau_lens: List[int], exp_found_lens: int):  # 'exp' short for 'expected'
+    game_no_shuffle = Klondike.new_game(False)
+
+    assert len(game_no_shuffle.stock) == exp_stock_len
+    assert len(game_no_shuffle.pile) == exp_pile_len
+    for i, tableau in enumerate(game_no_shuffle.tableaus):
+        assert len(tableau) == exp_tableau_lens[i]
     for foundation in game_no_shuffle.foundations:
         assert len(foundation) == exp_found_lens
 
