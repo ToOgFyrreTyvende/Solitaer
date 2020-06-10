@@ -23,8 +23,8 @@
   width: 200px;
   height: 200px;
   position: fixed;
-  top: calc(50% - 100px);
-  left: calc(50% - 100px);
+  top: calc(50% - 120px);
+  left: calc(50% - 120px);
   z-index: 3;
   filter: blur(2px) brightness(0deg);
   margin: 20px;

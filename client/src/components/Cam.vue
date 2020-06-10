@@ -163,7 +163,9 @@
   position: fixed;
   top: 30%;
   left: 0;
-  border-top: 3px solid white;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.6);
+  width: 100%;
 }
 
 #cam {
