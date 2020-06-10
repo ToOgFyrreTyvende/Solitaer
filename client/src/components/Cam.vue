@@ -45,6 +45,8 @@
       @cameras="onCameras"
       @camera-change="onCameraChange"
     />
+    <div class="guide-line"></div>
+
     <div ref="flashing_bg" class="flashing-bg"></div>
 
     <button
@@ -84,6 +86,7 @@
   cursor: pointer;
   display: inline-block;
   transition: 0.3s;
+  background-color: white;
 }
 .bar1,
 .bar2,
@@ -143,6 +146,14 @@
   padding-right: 1rem;
 }
 
+.guide-line {
+  z-index: 2;
+  position: fixed;
+  top: 30%;
+  left: 0;
+  border-top: 3px solid white;
+}
+
 #cam {
   object-fit: cover;
   position: fixed;
@@ -154,8 +165,8 @@
   z-index: 2;
   position: fixed;
   bottom: 35px;
-  right: 72.5px;
-  transform: translateX(50%);
+  right: 50%;
+  transform: translateX(-50%);
 
   display: block;
   border-radius: 50%;
@@ -175,6 +186,16 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+@media only screen and (orientation: landscape) {
+  #take-picture {
+    z-index: 2;
+    position: fixed;
+    bottom: 50%;
+    right: 35px;
+    transform: translateY(-50%);
+  }
 }
 </style>
 
