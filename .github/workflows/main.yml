@@ -28,7 +28,7 @@ jobs:
     - name: Build and release
       working-directory: ./client
       run: |
-        npm run build
+        NODE_ENV=prod npm run build
         mv -v ./dist/* /var/www/html/soli/
         echo "done :)"
 
