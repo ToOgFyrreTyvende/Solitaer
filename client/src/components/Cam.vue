@@ -3,6 +3,7 @@
     <loader v-show="loading" type="1"></loader>
 
     <div
+      data-v-step="0"
       class="menuToggleContainer"
       v-bind:class="{change: show_side_menu}"
       ref="menuToggler"
@@ -23,6 +24,7 @@
           :value="device.deviceId"
         >{{ device.label }}</option>
       </select>
+      <b-button @click="guideOpen()">Show guide</b-button>
     </div>
 
     <b-modal ref="modal" id="modal" size="xl" title="Response" hide-footer hide-backdrop>
@@ -45,16 +47,19 @@
       @cameras="onCameras"
       @camera-change="onCameraChange"
     />
-    <div class="guide-line"></div>
+    <div class="guide-line" data-v-step="1"></div>
 
     <div ref="flashing_bg" class="flashing-bg"></div>
 
     <button
+      data-v-step="2"
       ref="take_picture"
       id="take-picture"
       v-bind:class="{change: show_side_menu}"
       @click="analyzePicture()"
     ></button>
+
+    <v-tour name="intro" :steps="steps"></v-tour>
   </div>
 </template>
 
@@ -82,7 +87,7 @@
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 2;
+  z-index: 3;
   cursor: pointer;
   display: inline-block;
   transition: 0.3s;
@@ -129,7 +134,7 @@
   height: 100%;
   width: 0;
   position: fixed;
-  z-index: 1;
+  z-index: 2;
   top: 0;
   left: 0;
   background-color: rgba(33, 33, 33, 0.9);
@@ -158,8 +163,12 @@
   padding-right: 1rem;
 }
 
+.sidenav > * {
+  margin-bottom: 1rem;
+}
+
 .guide-line {
-  z-index: 2;
+  z-index: 1;
   position: fixed;
   top: 30%;
   left: 0;
@@ -234,8 +243,42 @@ export default {
       loading: false,
       return_img: null,
       show_side_menu: false,
-      cards: ""
+      cards: "",
+      steps: [
+        {
+          target: '[data-v-step="0"]',
+          header: {
+            title: "Welcome!"
+          },
+          content: `Set camera specific settings here.`
+        },
+        {
+          target: '[data-v-step="1"]',
+          header: {
+            title: "Guide line"
+          },
+          content: `Make sure your stock, pile and foundations are above this guide line.
+          <br>
+          <img class="img-fluid" src="./intro-example.jpg" />`
+        },
+        {
+          target: '[data-v-step="2"]',
+          header: {
+            title: "Analyze the board"
+          },
+          content: `Press this when you're ready to play!`,
+          params: {
+            placement: "right"
+          }
+        }
+      ]
     };
+  },
+  mounted() {
+    if (localStorage.intro != "true") {
+      localStorage.intro = true;
+      this.$tours["intro"].start();
+    }
   },
   computed: {
     device() {
@@ -259,6 +302,10 @@ export default {
   methods: {
     menuToggle() {
       this.show_side_menu = !this.show_side_menu;
+    },
+    guideOpen() {
+      if (this.show_side_menu) this.show_side_menu = false;
+      this.$tours["intro"].start();
     },
     hideScreenElements() {
       if (this.show_side_menu) this.show_side_menu = false;
@@ -306,6 +353,7 @@ export default {
       this.loading = false;
     },
     analyzePicture() {
+      this.hideScreenElements();
       this.flashAndFade();
 
       setTimeout(() => {
