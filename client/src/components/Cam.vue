@@ -266,7 +266,7 @@ export default {
           header: {
             title: "Analyze the board"
           },
-          content: `Press this when you're ready to play!`,
+          content: `Press here when you're ready to analyze your board!`,
           params: {
             placement: "right"
           }
