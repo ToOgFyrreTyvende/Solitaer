@@ -86,18 +86,30 @@
   cursor: pointer;
   display: inline-block;
   transition: 0.3s;
-  background-color: white;
+  background-color: rgba(33, 33, 33, 0.9);
+  padding: 0.8rem;
 }
 .bar1,
 .bar2,
 .bar3 {
   width: 35px;
   height: 5px;
-  background-color: #333;
-  margin: 6px 0;
+  background-color: #f8f8f8;
   transition: 0.4s;
 }
+.bar1 {
+  margin: 0 0 6px 0;
+}
+.bar2 {
+  margin: 6px 0;
+}
+.bar3 {
+  margin: 6px 0 0 0;
+}
 
+.change .menuToggleContainer {
+  background: none;
+}
 .change .bar1 {
   -webkit-transform: rotate(-45deg) translate(-9px, 6px);
   transform: rotate(-45deg) translate(-9px, 6px);
@@ -120,7 +132,7 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #111;
+  background-color: rgba(33, 33, 33, 0.9);
   overflow-x: hidden;
   padding-top: 80px;
   transition: 0.3s;
@@ -166,7 +178,7 @@
   position: fixed;
   bottom: 35px;
   right: 50%;
-  transform: translateX(-50%);
+  transform: translateX(50%);
 
   display: block;
   border-radius: 50%;
@@ -194,7 +206,7 @@
     position: fixed;
     bottom: 50%;
     right: 35px;
-    transform: translateY(-50%);
+    transform: translateY(50%);
   }
 }
 </style>
