@@ -266,10 +266,7 @@ export default {
           header: {
             title: "Analyze the board"
           },
-          content: `Press here when you're ready to analyze your board!`,
-          params: {
-            placement: "right"
-          }
+          content: `Press here when you're ready to analyze your board!`
         }
       ]
     };
