@@ -250,7 +250,7 @@ export default {
           header: {
             title: "Welcome!"
           },
-          content: `Set camera specific settings here.`
+          content: `Set camera specific settings and browse options here.`
         },
         {
           target: '[data-v-step="1"]',
