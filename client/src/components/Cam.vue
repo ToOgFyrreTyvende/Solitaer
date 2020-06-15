@@ -290,7 +290,6 @@ export default {
     };
   },
   mounted() {
-    this.$refs.modal.show();
     if (localStorage.intro != "true") {
       localStorage.intro = true;
       this.$tours["intro"].start();
