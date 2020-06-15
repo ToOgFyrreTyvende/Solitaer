@@ -27,7 +27,8 @@
       <b-button @click="guideOpen()">Show guide</b-button>
     </div>
 
-    <b-modal ref="modal" id="modal" size="xl" title="Response" hide-footer hide-backdrop>
+    <b-modal ref="modal" id="modal" size="xl" title="Hint" hide-footer hide-backdrop>
+      <diagram kind="tableau" v-bind:move="move"></diagram>
       <img class="img-fluid" v-bind:src="return_img" v-show="return_img != null" />
       <br />
       {{cards}}
@@ -177,6 +178,17 @@
   width: 100%;
 }
 
+.guide-line::after {
+  content: "";
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 35%;
+  height: 30%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
 #cam {
   object-fit: cover;
   position: fixed;
@@ -227,12 +239,14 @@
 import axios from "axios";
 import { WebCam } from "vue-web-cam";
 import Loader from "./Loader.vue";
+import CardDiagram from "./CardDiagram.vue";
 
 export default {
   name: "Cam",
   components: {
     "vue-web-cam": WebCam,
-    loader: Loader
+    loader: Loader,
+    diagram: CardDiagram
   },
   data() {
     return {
@@ -244,6 +258,10 @@ export default {
       return_img: null,
       show_side_menu: false,
       cards: "",
+      move: {
+        from: "Qs",
+        to: "Kh"
+      },
       steps: [
         {
           target: '[data-v-step="0"]',
@@ -272,6 +290,7 @@ export default {
     };
   },
   mounted() {
+    this.$refs.modal.show();
     if (localStorage.intro != "true") {
       localStorage.intro = true;
       this.$tours["intro"].start();
