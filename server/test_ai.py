@@ -3,7 +3,7 @@ from typing import Union, Tuple
 
 import pytest
 
-from ai import new_find_move, MOVE_CODE
+from ai import MOVE_CODE, new_find_move, find_move_wrapper
 from logic import draw, move, Klondike
 
 
@@ -58,6 +58,25 @@ game_after_draw, g_move4, g_move3, g_move1 = build_test_games()
 ])
 def test_new_find_move(game: Klondike, expected: Union[int, Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]):
     assert new_find_move(game) == expected
+
+
+def wrapper_dict_builder(kind: str = 'MOVE', move_to: str = None, move_from: str = None):
+    return {'kind': kind, 'move': {'to': move_to, 'from': move_from}}
+
+
+@pytest.mark.parametrize('game, expected', [
+    (Klondike.new_game(), wrapper_dict_builder(kind='DRAW')),
+    (game_after_draw, wrapper_dict_builder(move_from=game_after_draw.tableaus[1][-1].translate(),
+                                           move_to=game_after_draw.tableaus[2][-1].translate())),
+    (g_move4, wrapper_dict_builder(move_from=g_move4.pile[-1].translate(),
+                                   move_to=g_move4.tableaus[2][-1].translate())),
+    # (g_move3, wrapper_dict_builder(move_from=g_move3.pile[-1].translate(),
+    #                                move_to=g_move3.foundations[0][-1].translate())),
+    (g_move1, wrapper_dict_builder(move_from=g_move1.tableaus[2][-1].translate(),
+                                   move_to=g_move1.foundations[1][-1].translate()))
+])
+def test_find_move_wrapper(game: Klondike, expected: Union[int, Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]):
+    assert find_move_wrapper(game) == expected
 
 
 if __name__ == "__main__":
