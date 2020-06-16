@@ -42,7 +42,7 @@ class Card:
 
     def translate(self) -> str:
         name_values = {1: 'A', 11: 'J', 12: 'Q', 13: 'K'}
-        card_val = name_values.get(self.value, default=self.value)
+        card_val = name_values.get(self.value, self.value)
         return f'{card_val}{self.suit}'
 
 
