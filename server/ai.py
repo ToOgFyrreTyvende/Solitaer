@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 from enum import IntEnum
 
 from logic import print_game, move, draw, Klondike, check_move, Card
@@ -72,6 +72,32 @@ def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, 
         return MOVE_CODE.DRAW,
 
     return MOVE_CODE.ERROR,  # No other options matched, give up
+
+
+def find_move_wrapper(g: Klondike) -> Dict[str, Union[str, Dict[str, Union[str, None]]]]:
+    """Translates the 'new_find_move' functions results to something the client side understands!
+
+    returns a dict such as this:
+    >>> find_move_wrapper(g)
+    {'kind': 'MOVE', 'move': {'to': Ks, 'from': Qh}}
+    (If the function recommends moving a red queen to a black king that is...)
+    """
+    response = {'kind': 'MOVE', 'move': {'to': None, 'from': None}}
+
+    code, *instr = new_find_move(g)
+    if code == MOVE_CODE.DRAW:
+        response['kind'] = 'DRAW'
+    elif code == MOVE_CODE.T_TO_F:
+        response['move']['from'] = g.tableaus[instr[0]][-1].translate()
+        response['move']['to'] = g.foundations[instr[1]][-1].translate()
+    elif code == MOVE_CODE.T_TO_T:
+        response['move']['from'] = g.tableaus[instr[0]][-1].translate()
+        response['move']['to'] = g.tableaus[instr[1]][-instr[2]].translate()
+    elif code == MOVE_CODE.P_TO_F or code == MOVE_CODE.P_TO_T:
+        response['move']['from'] = g.pile[-1].translate()
+        response['move']['to'] = g.foundations[instr[0]][-1].translate() if code == MOVE_CODE.P_TO_F else g.tableaus[instr[0]][-1].translate()
+
+    return response
 
 
 def find_move(g: Klondike):
