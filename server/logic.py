@@ -40,6 +40,11 @@ class Card:
         else:
             return Card(value=int(string[0]), suit=string[-1], flipped = True)
 
+    def translate(self) -> str:
+        name_values = {1: 'A', 11: 'J', 12: 'Q', 13: 'K'}
+        card_val = name_values.get(self.value, self.value)
+        return f'{card_val}{self.suit}'
+
 
 @dataclass_json
 @dataclass
