@@ -1,6 +1,7 @@
-import numpy as np
+from typing import List, Tuple
+
 import cv2
-import time
+import numpy as np
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -16,7 +17,7 @@ def get_background_reference(gray_image):
     return 170
 
 
-def threshold_image(image):
+def threshold_image(image: np.ndarray) -> np.ndarray:
     grayed = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(grayed, (1, 1), 1000)
 
@@ -28,7 +29,7 @@ def threshold_image(image):
     return thresholded
 
 
-def find_number_suit(thresholded_image, img):
+def find_slices(thresholded_image: np.ndarray, img: np.ndarray) -> List[Tuple[np.ndarray, np.ndarray]]:
     #thresholded_image = cv2.erode(thresholded_image, kernel, iterations=1)
     cnts, hier = cv2.findContours(
         thresholded_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -47,7 +48,7 @@ def find_number_suit(thresholded_image, img):
         box = cv2.minAreaRect(c)
         box = cv2.boxPoints(box)
         box = np.array(box, dtype="int")
-        img_slices.append(warp_bboxes(img, box))
+        img_slices.append((box, warp_bboxes(img, box)))
         cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
         rects.append(box)
 
