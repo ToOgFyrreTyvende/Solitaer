@@ -38,7 +38,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 img {
   max-height: 20rem;
   width: auto;

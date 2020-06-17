@@ -60,7 +60,8 @@
       @click="analyzePicture()"
     ></button>
 
-    <v-tour name="intro" :steps="steps"></v-tour>
+    <intro-modal ref="intro_modal"></intro-modal>
+    <v-tour name="intro_tour" :steps="steps"></v-tour>
   </div>
 </template>
 
@@ -234,19 +235,21 @@
 }
 </style>
 
-
 <script>
 import axios from "axios";
 import { WebCam } from "vue-web-cam";
 import Loader from "./Loader.vue";
 import CardDiagram from "./CardDiagram.vue";
+import Images from "./Images";
+import IntroModal from "./IntroModal.vue";
 
 export default {
   name: "Cam",
   components: {
     "vue-web-cam": WebCam,
     loader: Loader,
-    diagram: CardDiagram
+    diagram: CardDiagram,
+    "intro-modal": IntroModal
   },
   data() {
     return {
@@ -277,7 +280,7 @@ export default {
           },
           content: `Make sure your stock, pile and foundations are above this guide line.
           <br>
-          <img class="img-fluid" src="./intro-example.jpg" />`
+          <img class="img-fluid" src="${Images.intro_example}" />`
         },
         {
           target: '[data-v-step="2"]',
@@ -292,7 +295,7 @@ export default {
   mounted() {
     if (localStorage.intro != "true") {
       localStorage.intro = true;
-      this.$tours["intro"].start();
+      this.guideOpen();
     }
   },
   computed: {
@@ -320,7 +323,10 @@ export default {
     },
     guideOpen() {
       if (this.show_side_menu) this.show_side_menu = false;
-      this.$tours["intro"].start();
+      let _this = this;
+      this.$refs.intro_modal.show(() => {
+        _this.$tours["intro_tour"].start();
+      });
     },
     hideScreenElements() {
       if (this.show_side_menu) this.show_side_menu = false;

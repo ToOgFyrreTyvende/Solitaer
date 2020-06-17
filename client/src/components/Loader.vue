@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .backdrop {
   position: fixed;
   width: 100%;
