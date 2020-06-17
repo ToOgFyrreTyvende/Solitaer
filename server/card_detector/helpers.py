@@ -13,7 +13,7 @@ def get_background_reference(gray_image):
     image_w, image_h = np.shape(gray_image)[:2]
     # Select random pixel at the bottom left as background reference point
     background_pixel = gray_image[int(image_w/100)][int(image_h/100)]
-    return background_pixel + BG_THRESHOLD
+    return 170
 
 
 def threshold_image(image):

@@ -1,6 +1,8 @@
+from typing import Tuple, List
+
 import cv2
 import numpy as np
-from helpers import *
+from card_detector.helpers import threshold_image, find_number_suit, warp_bboxes
 from numpy.linalg import norm
 import os
 
@@ -9,7 +11,7 @@ CONFIDENCE_CUTOFF = 0.3
 CLASS_IDS = []
 
 dirname = os.path.dirname(__file__)
-weights = os.path.join(dirname, "yolocards_final.weights")
+weights = os.path.join(dirname, "reanchored.weights")
 names = os.path.join(dirname, "cards.names")
 cfg = os.path.join(dirname, "cards.cfg")
 # load neural network from YOLO weights and config
@@ -88,27 +90,50 @@ def draw_cards(img, detections):
                     cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 3)
 
 
-def infer_from_image(raw_img):
-    # Scale image to be only 40% of width and height
-    #img = cv2.resize(raw_img, None, fx=1, fy=1)
-    height, width, channels = raw_img.shape
-    w_scale = 1
-    h_scale = 1
-    if height > 608:
-        h_scale = (height-(height-605))/height
-    if width > 608:
-        w_scale = (width-(width-605))/width
+def scale_down_img(raw_img: np.ndarray) -> np.ndarray:
+    height, width, _ = raw_img.shape
+    w_scale = h_scale = 1
+    if height > 553:
+        h_scale = 550 / height
+    if width > 553:
+        w_scale = 550 / width
 
     if w_scale != 1 or h_scale != 1:
-        raw_img = cv2.resize(raw_img, None, fx=w_scale, fy=h_scale)
+        raw_img = cv2.resize(raw_img, None, fx=h_scale, fy=h_scale)
 
-    height, width, channels = raw_img.shape
+    return raw_img
 
-    top_bot = int((608-height)/2)
-    left_right = int((608-width)/2)
+
+def scale_up_img(raw_img: np.ndarray) -> np.ndarray:
+    height, width, _ = raw_img.shape
+    w_scale = h_scale = 1
+    if height < 550:
+        h_scale = 550 / height
+    if width < 550:
+        w_scale = 550 / width
+
+    if w_scale != 1 or h_scale != 1:
+        raw_img = cv2.resize(raw_img, None, fx=h_scale, fy=h_scale)
+
+    return raw_img
+
+
+def infer_from_image(raw_img: np.ndarray):
+    # Scale image to be only 40% of width and height
+    # img = cv2.resize(raw_img, None, fx=1, fy=1)
+
+    # Scale image down/up the right way (cv2.resize(img, 608, 608) stretches the image, so we do it by scale)
+    # scaled = scale_down_img(scale_up_img(raw_img))
+    scaled = scale_up_img(scale_down_img(raw_img))
+    # scaled = scale_down_img(raw_img)
+
+    height, width, _ = scaled.shape
+
+    top_bot = int((608 - height) / 2)
+    left_right = int((608 - width) / 2)
 
     image = cv2.copyMakeBorder(
-        raw_img, top_bot, top_bot, left_right, left_right, cv2.BORDER_CONSTANT)
+        scaled, top_bot, top_bot, left_right, left_right, cv2.BORDER_CONSTANT)
 
     # Detecting the objects
     # https://docs.opencv.org/master/d6/d0f/group__dnn.html#ga29f34df9376379a603acd8df581ac8d7
@@ -119,7 +144,7 @@ def infer_from_image(raw_img):
     # Mean is scalar values subtracted from channels. We do not change any color values.
     # SwapRB indicates swapping first and last channels in 3 channel images
     blob = cv2.dnn.blobFromImage(
-        image, 1/255, (608, 608), (0, 0, 0), True, crop=False)
+        image=image, scalefactor=1 / 255, size=(608, 608), mean=(0, 0, 0), swapRB=True, crop=False)
     # Load binary image data into our neural network and infer
     nnet.setInput(blob)
     outputs = nnet.forward(output_layers)
@@ -134,7 +159,7 @@ def infer_from_image(raw_img):
 
 
 def area(a, b, c):
-    return 0.5 * norm(np.cross(b-a, c-a))
+    return 0.5 * norm(np.cross(b - a, c - a))
 
 
 def create_stacks(bboxes, detections):
@@ -199,12 +224,77 @@ def create_stacks(bboxes, detections):
     return (foundations[0], [foundations[1]], [x[1] for x in sorted(tableaus, key=lambda x: x[0])])
 
 
-def extract_cards_from_image(img):
-    #detections = infer_from_image(img)
+def new_create_stacks(bboxes: List[np.ndarray], detections: List[tuple], img_height: int, img_width: int) -> Tuple:
+    pile: list = []
+    foundations: list = []
+    tableaus: list = []
+    cutoff_y: int = int(img_height * 0.3)
+    cutoff_x: int = int(img_width * 0.35)
+
+    for i, [A, B, C, D] in enumerate(bboxes):
+        ABC = area(A, B, C)
+        CDA = area(C, D, A)
+        rect_area = ABC + CDA
+        if C[1] > cutoff_y:  # Cards are under the 30% line
+            cards: list = []
+            for class_id, confidence, pos in detections:
+                [cx, cy, cw, ch] = pos
+                P = [cx + cw/2, cy + ch/2]
+                # https://math.stackexchange.com/a/190117
+                """
+                A-------------B
+                |\           /|
+                | \         / |
+                |  \  PBA  /  |
+                |   \     /   |
+                |    \   /    |
+                |     \ /     |
+                | APD  P  CPB |
+                |     / \     |
+                |    /   \    |
+                |   /     \   |
+                |  /  DPC  \  |
+                | /         \ |
+                |/           \|
+                D-------------C
+                If the APD + DPC + CPB + PBA > ABC + CDA, then the point P is not within the rectangle ABCD
+                """
+                area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                if area_check == rect_area:
+                    cards.append((P[1], str(CLASS_IDS[class_id])))
+            tableaus.append([x[1] for x in sorted(cards, key=lambda x: x[0])])
+        else:
+            if C[0] > cutoff_x:  # Cards are over the 30% line and right of the 35% line
+                for class_id, confidence, pos in detections:
+                    cx, cy, cw, ch = pos
+                    P = [cx + cw/2, cy + ch/2]
+                    area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                    if area_check == rect_area:
+                        foundations.append(str(CLASS_IDS[class_id]))
+            else:  # Cards are over the 30% line and left of the 35% line
+                for class_id, confidence, pos in detections:
+                    cx, cy, cw, ch = pos
+                    P = [cx + cw / 2, cy + ch / 2]
+                    area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                    if area_check == rect_area:
+                        pile.append(str(CLASS_IDS[class_id]))
+
+    return pile, foundations, tableaus
+
+
+def extract_cards_from_image(img: np.ndarray):
+    # detections = infer_from_image(img)
     processed_img = threshold_image(img)
     img_slices = find_number_suit(processed_img, img)
     [infer_from_image(x) for x in img_slices]
     return "oke"
+
+
+def new_extract_cards_from_image(img: np.ndarray):
+    detections = infer_from_image(img)
+    processed_img = threshold_image(img)
+    bboxes = find_number_suit(processed_img, img)
+    return detections, bboxes
 
 
 def get_card_classes(detections):
@@ -216,7 +306,7 @@ def get_card_classes(detections):
 
 
 if __name__ == "__main__":
-    img = cv2.resize(cv2.imread("cards4.jpg"), (1280, 720))
+    img = cv2.imread("dui.png")
     print(extract_cards_from_image(img))
     cv2.imshow("Image", img)
     cv2.waitKey(0)
