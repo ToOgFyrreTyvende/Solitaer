@@ -11,7 +11,7 @@
       Each new hint requires you to take a new picture of the updated playing board.
       The hints come back to the website in the following form:
     </p>
-    <card-diagram id="example_diagram" kind="tableau" :move="card_diagram_data"></card-diagram>
+    <card-diagram id="example_diagram" kind="foundation" :move="card_diagram_data"></card-diagram>
     <p>You can take a tour of the UI by clicking "Start tour", otherwise if you're ready to play, press skip!</p>
 
     <template v-slot:modal-footer="{ ok, hide }">
@@ -22,9 +22,6 @@
 </template>
 
 <style scoped>
-#example_diagram {
-  margin: 25px 0;
-}
 </style>
 
 
