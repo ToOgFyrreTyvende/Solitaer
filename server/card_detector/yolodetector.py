@@ -137,7 +137,7 @@ def infer_from_image(raw_img: np.ndarray) -> List[Detection]:
     # Scale image down/up the right way (cv2.resize(img, 608, 608) stretches the image, so we do it by scale)
     # scaled = scale_down_img(scale_up_img(raw_img))
     # scaled = scale_up_img(scale_down_img(raw_img))
-    print(raw_img.shape)
+    logging.info(f'current img shape: {raw_img.shape}')
     scaled = scale_down_img(raw_img)
 
     height, width, _ = scaled.shape
