@@ -51,8 +51,8 @@ class Card:
 class Klondike:
     stock: List[Card] = field(default_factory=list)
     pile: List[Card] = field(default_factory=list)
-    tableaus: List[List[Card]] = field(default_factory=list)
-    foundations: List[List[Card]] = field(default_factory=list)
+    tableaus: List[List[Card]] = field(default_factory=lambda: [[], [], [], [], [], [], []])
+    foundations: List[List[Card]] = field(default_factory=lambda: [[], [], [], []])
 
     @staticmethod
     def new_game(shuffle: bool = True) -> Klondike:
@@ -63,15 +63,13 @@ class Klondike:
         for card in game.stock: card.flipped = True
         game.pile = []
 
-        game.tableaus.append(deck[24:25]); game.tableaus[0][-1].flipped = True
-        game.tableaus.append(deck[25:27]); game.tableaus[1][-1].flipped = True
-        game.tableaus.append(deck[27:30]); game.tableaus[2][-1].flipped = True
-        game.tableaus.append(deck[30:34]); game.tableaus[3][-1].flipped = True
-        game.tableaus.append(deck[34:39]); game.tableaus[4][-1].flipped = True
-        game.tableaus.append(deck[39:45]); game.tableaus[5][-1].flipped = True
-        game.tableaus.append(deck[45:52]); game.tableaus[6][-1].flipped = True
-
-        game.foundations = [[], [], [], []]
+        game.tableaus[0] = deck[24:25]; game.tableaus[0][-1].flipped = True
+        game.tableaus[1] = deck[25:27]; game.tableaus[1][-1].flipped = True
+        game.tableaus[2] = deck[27:30]; game.tableaus[2][-1].flipped = True
+        game.tableaus[3] = deck[30:34]; game.tableaus[3][-1].flipped = True
+        game.tableaus[4] = deck[34:39]; game.tableaus[4][-1].flipped = True
+        game.tableaus[5] = deck[39:45]; game.tableaus[5][-1].flipped = True
+        game.tableaus[6] = deck[45:52]; game.tableaus[6][-1].flipped = True
 
         return game
 
