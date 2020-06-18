@@ -1,3 +1,4 @@
+import logging
 import os
 from itertools import groupby
 from typing import Tuple, List, Union
@@ -268,6 +269,7 @@ def new_extract_cards_from_image(img: np.ndarray) -> Tuple[List[str], List[List[
     # Slice detection: (np.ndarray, [class: int, confidence: float, [x, y, w, h]])
     slice_detections: List[Tuple[np.ndarray, List[Tuple[int, float, List[int]]]]]
 
+    logging.info('List of detections for each slice:')
     slice_detections = [(box, infer_from_image(_img)) for box, _img in img_slices]
     slice_detections = [item for item in slice_detections if len(item[1])]  # Remove elements with no detections
     logging.info('End of detection list\n')
