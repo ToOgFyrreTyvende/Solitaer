@@ -1,12 +1,15 @@
-import uuid
-import numpy as np
-import cv2
 import base64
-from card_detector.yolodetector import extract_cards_from_image, get_card_classes
+import uuid
+from typing import Union, Dict
 
-from flask import Flask, jsonify, request, make_response
+import cv2
+import numpy as np
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+from ai import find_move_wrapper
+from card_detector.yolodetector import extract_cards_from_image, get_card_classes, new_extract_cards_from_image
+from logic import Klondike, Card
 
 BOOKS = [
     {
@@ -53,6 +56,7 @@ def remove_book(book_id):
 def ping_pong():
     return jsonify('pong!')
 
+
 @app.route('/boardAnalyse', methods=['POST'])
 def boardAnalyse():
     img_data = request.json['data'][23:]
@@ -63,7 +67,28 @@ def boardAnalyse():
     jpg_as_text = base64.b64encode(buffer).decode('utf-8') 
     json = {'cards': get_card_classes(detections), 'img_data': jpg_as_text}
     return jsonify(json)
-    
+
+
+def get_move_from_img(img: np.ndarray) -> Dict[str, Union[str, Dict[str, Union[str, None]]]]:
+    (img_pile, img_founds, img_tableaus) = new_extract_cards_from_image(img)
+    img_pile = img_pile[0]
+
+    game = Klondike()
+    game.pile = [Card.from_str(card) for card in img_pile]
+    game.foundations = [[Card.from_str(card) for card in lst] for lst in img_founds]
+    game.tableaus = [[Card.from_str(card) for card in lst] for lst in img_tableaus]
+
+    return find_move_wrapper(game)
+
+
+@app.route('/getMove', methods=['POST'])
+def get_next_klondike_move():
+    img_data = request.json['data'][23:]
+    np_arr = np.fromstring(base64.b64decode(img_data), np.uint8)
+    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+    return jsonify(get_move_from_img(img))
+
 
 @app.route('/books', methods=['GET', 'POST'])
 def all_books():
