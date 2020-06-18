@@ -15,6 +15,8 @@ DEBUG = False
 CONFIDENCE_CUTOFF = 0.3
 CLASS_IDS: List[str]
 
+config = {'probability_cutoff': 0.5}
+
 dirname = os.path.dirname(__file__)
 weights = os.path.join(dirname, "reanchored.weights")
 names = os.path.join(dirname, "cards.names")
@@ -39,9 +41,10 @@ def detect_cards(outputs, real_w, real_h):
     for output in outputs:
         for detection in output:
             # Confidences are extracted from the output, to determine how precise algorithm is of detection
-            # The scores are the remaining values after 5. index. The first elements are x y w h values
+            # The scores are the remaining values after 5. index. The first elements are x y w h pc (confidence probability) values
             # The confidences will be a confidence of a card being either of the 52 possible card suit + number combos.
             # The remaining elements of this array will have a value from 0.0 - 1.0
+            if detection[4] < config['probability_cutoff']: continue
             scores = detection[5:]
             # The class_id can be found from the INDEX of the highest value of these scores (the scores of each class)
             # argmax returns index of highest value
