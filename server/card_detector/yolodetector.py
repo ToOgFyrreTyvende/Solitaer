@@ -18,7 +18,7 @@ config_file = os.path.join(dirname, '../config.cfg')
 config = configparser.ConfigParser()
 config.read(config_file)
 yolo_cfg = config['YOLO']
-sep_cfg = config['SEPERATORS']
+sep_cfg = config['SEPARATORS']
 
 DEBUG = False
 CONFIDENCE_CUTOFF = yolo_cfg.getfloat('confidence', fallback=0.3)
