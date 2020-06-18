@@ -40,11 +40,11 @@
 
 <style scoped>
 img {
-  max-height: 20rem;
-  width: auto;
+  max-width: 32%;
+  height: auto;
 }
 .diagram {
-  padding: 0 5rem 0 5rem;
+  padding: 1.5rem;
 }
 .card-group {
   display: flex;
@@ -56,6 +56,13 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 30%;
+}
+
+.hint h3 {
+  font-size: 2rem;
+  font-size: 2vw;
+  text-align: center;
 }
 </style>
 
