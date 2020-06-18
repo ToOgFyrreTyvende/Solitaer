@@ -1,8 +1,9 @@
+import os
+from typing import Tuple, List
+
 import cv2
 import numpy as np
 import pytest
-from typing import Tuple, List
-import os
 
 from card_detector.yolodetector import scale_up_img, scale_down_img, new_extract_cards_from_image
 
