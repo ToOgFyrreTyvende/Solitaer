@@ -101,13 +101,13 @@ def draw_cards(img, detections):
 def scale_down_img(raw_img: np.ndarray) -> np.ndarray:
     height, width, _ = raw_img.shape
     w_scale = h_scale = 1
-    if height > 553:
-        h_scale = 550 / height
-    if width > 553:
-        w_scale = 550 / width
+    if height > 605:
+        h_scale = 605 / height
+    if width > 605:
+        w_scale = 605 / width
 
     if w_scale != 1 or h_scale != 1:
-        raw_img = cv2.resize(raw_img, None, fx=h_scale, fy=h_scale)
+        raw_img = cv2.resize(raw_img, None, fx=w_scale, fy=h_scale)
 
     return raw_img
 
@@ -137,10 +137,10 @@ def infer_from_image(raw_img: np.ndarray) -> List[Detection]:
     # Scale image down/up the right way (cv2.resize(img, 608, 608) stretches the image, so we do it by scale)
     # scaled = scale_down_img(scale_up_img(raw_img))
     # scaled = scale_up_img(scale_down_img(raw_img))
+    print(raw_img.shape)
     scaled = scale_down_img(raw_img)
 
     height, width, _ = scaled.shape
-
     top_bot = int((608 - height) / 2)
     left_right = int((608 - width) / 2)
 

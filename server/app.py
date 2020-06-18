@@ -1,6 +1,7 @@
 import base64
 import uuid
 from typing import Union, Dict
+from itertools import chain
 
 import cv2
 import numpy as np
@@ -64,14 +65,15 @@ def boardAnalyse():
     img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     detections = extract_cards_from_image(img)
     retval, buffer = cv2.imencode('.jpeg', img)
-    jpg_as_text = base64.b64encode(buffer).decode('utf-8') 
+    jpg_as_text = base64.b64encode(buffer).decode('utf-8')
     json = {'cards': get_card_classes(detections), 'img_data': jpg_as_text}
     return jsonify(json)
 
 
 def get_move_from_img(img: np.ndarray) -> Dict[str, Union[str, Dict[str, Union[str, None]]]]:
-    (img_pile, img_founds, img_tableaus) = new_extract_cards_from_image(img)
-    img_pile = img_pile[0]
+    result = new_extract_cards_from_image(img)
+    (img_pile, img_founds, img_tableaus) = result
+    img_pile = chain(*img_pile)
 
     game = Klondike()
     game.pile = [Card.from_str(card) for card in img_pile]

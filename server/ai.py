@@ -85,7 +85,9 @@ def find_move_wrapper(g: Klondike) -> Dict[str, Union[str, Dict[str, Union[str, 
     response = {'kind': 'MOVE', 'move': {'to': None, 'from': None}}
 
     code, *instr = new_find_move(g)
-    if code == MOVE_CODE.DRAW:
+    if code == MOVE_CODE.ERROR:
+        response['kind'] = 'ERROR'
+    elif code == MOVE_CODE.DRAW:
         response['kind'] = 'DRAW'
     elif code == MOVE_CODE.T_TO_F:
         response['move']['from'] = g.tableaus[instr[0]][-1].translate()
