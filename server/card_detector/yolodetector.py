@@ -158,7 +158,7 @@ def infer_from_image(raw_img: np.ndarray) -> List[Detection]:
     outputs = nnet.forward(output_layers)
     detections = detect_cards(outputs, 608, 608)
     clean_detect = clean_detections(detections)
-    print(clean_detect)
+    logging.info(clean_detect)
     if DEBUG:
         draw_cards(image, clean_detect)
         cv2.imshow("bombie", image)
@@ -270,6 +270,7 @@ def new_extract_cards_from_image(img: np.ndarray) -> Tuple[List[str], List[List[
 
     slice_detections = [(box, infer_from_image(_img)) for box, _img in img_slices]
     slice_detections = [item for item in slice_detections if len(item[1])]  # Remove elements with no detections
+    logging.info('End of detection list\n')
 
     sorted_stacks = new_create_stacks(slice_detections, img_width=img.shape[1], img_height=img.shape[0])
 
@@ -288,8 +289,9 @@ def get_card_classes(detections):
 
 if __name__ == "__main__":
     from pprint import pprint
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
     img = cv2.imread("dui.png")
-    print(img.shape, '\n')
+    logging.info(f'img shape: {img.shape}\n')
     pprint(new_extract_cards_from_image(img))
     # cv2.imshow("Image", img)
     # cv2.waitKey(0)
