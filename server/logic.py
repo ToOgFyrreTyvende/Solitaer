@@ -3,14 +3,11 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from dataclasses_json import dataclass_json
 
 # Constants
-# SUITS = ['hearts', 'diamonds', 'spades', 'clubs']
-# SUITS = ['h', 'd', 's', 'c']
-# SUITS = ['♡', '♢', '♠', '♣']
 # SUITS = {'h': '♡', 'd': '♢', 's': '♠', 'c': '♣'}
 SUITS = {'h': 'h', 'd': 'd', 's': 's', 'c': 'c'}
 
@@ -23,12 +20,17 @@ class Card:
     flipped: bool = False
 
     @property
-    def is_black(self):
+    def is_black(self) -> bool:
         return self.suit in list(SUITS.values())[2:]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Card representation"""
         return f'{self.value:2}{self.suit}'
+
+    def __str__(self) -> str:
+        name_values = {1: 'A', 11: 'J', 12: 'Q', 13: 'K'}
+        card_val = name_values.get(self.value, self.value)
+        return f'{card_val}{self.suit}'
 
     @staticmethod
     def from_str(string: str) -> Card:
@@ -39,11 +41,6 @@ class Card:
             return Card(value=name_values[string[0]], suit=string[-1], flipped = True)
         else:
             return Card(value=int(string[0]), suit=string[-1], flipped = True)
-
-    def translate(self) -> str:
-        name_values = {1: 'A', 11: 'J', 12: 'Q', 13: 'K'}
-        card_val = name_values.get(self.value, self.value)
-        return f'{card_val}{self.suit}'
 
 
 @dataclass_json
@@ -72,6 +69,15 @@ class Klondike:
         game.tableaus[6] = deck[45:52]; game.tableaus[6][-1].flipped = True
 
         return game
+
+
+def get_card_at(card_lst: List[Card], index: int = -1, to_str: bool = True) -> Union[Card, None]:
+    """Takes a list of cards and returns the card at the given index
+    :returns Card or None if no card is found at given index
+    :returns str of Card if 'to_str' is True
+    """
+    try: return str(card_lst[index]) if to_str else card_lst[index]
+    except IndexError: return None
 
 
 DEFAULT_DECK = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
