@@ -2,6 +2,7 @@ import logging
 import os
 from itertools import groupby
 from typing import Tuple, List, Union
+import configparser
 
 import cv2
 import numpy as np
@@ -11,13 +12,21 @@ from card_detector.helpers import threshold_image, find_slices
 
 Detection = Tuple[int, float, List[int]]
 
+dirname = os.path.dirname(__file__)
+config_file = os.path.join(dirname, '../config.cfg')
+
+config = configparser.ConfigParser()
+config.read(config_file)
+yolo_cfg = config['YOLO']
+sep_cfg = config['SEPERATORS']
+
 DEBUG = False
-CONFIDENCE_CUTOFF = 0.3
+CONFIDENCE_CUTOFF = yolo_cfg.getfloat('confidence', fallback=0.3)
+PROBABILITY_CUTOFF = yolo_cfg.getfloat('probability', fallback=0.5)
+HORIZONTAL_LINE_CUTOFF = sep_cfg.getfloat('horizontal', fallback=0.25)
+VERTICAL_LINE_CUTOFF = sep_cfg.getfloat('vertical', fallback=0.35)
 CLASS_IDS: List[str]
 
-config = {'probability_cutoff': 0.5}
-
-dirname = os.path.dirname(__file__)
 weights = os.path.join(dirname, "reanchored.weights")
 names = os.path.join(dirname, "cards.names")
 cfg = os.path.join(dirname, "cards.cfg")
@@ -44,7 +53,7 @@ def detect_cards(outputs, real_w, real_h):
             # The scores are the remaining values after 5. index. The first elements are x y w h pc (confidence probability) values
             # The confidences will be a confidence of a card being either of the 52 possible card suit + number combos.
             # The remaining elements of this array will have a value from 0.0 - 1.0
-            if detection[4] < config['probability_cutoff']: continue
+            if detection[4] < PROBABILITY_CUTOFF: continue
             scores = detection[5:]
             # The class_id can be found from the INDEX of the highest value of these scores (the scores of each class)
             # argmax returns index of highest value
@@ -233,8 +242,8 @@ def create_stacks(bboxes: List[np.ndarray], detections: List[tuple], img_height:
 
 
 def new_create_stacks(boxes_and_slices: List[Tuple[np.ndarray, List[Detection]]], img_height: int, img_width: int) -> Tuple[List[Tuple[np.ndarray, List[Detection]]], List[Tuple[np.ndarray, List[Detection]]], List[Tuple[np.ndarray, List[Detection]]]]:
-    cutoff_y: int = int(img_height * 0.25)
-    cutoff_x: int = int(img_width * 0.35)
+    cutoff_y: int = int(img_height * HORIZONTAL_LINE_CUTOFF)
+    cutoff_x: int = int(img_width * VERTICAL_LINE_CUTOFF)
 
     upper_cards = {True: [], False: []}
     for key, group in groupby(boxes_and_slices, lambda x: x[0][2][1] < cutoff_y):
@@ -294,7 +303,9 @@ def get_card_classes(detections):
 
 if __name__ == "__main__":
     from pprint import pprint
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+    logging.debug(f'YOLO cutoffs:\nProbability: {PROBABILITY_CUTOFF}\nConfidence: {CONFIDENCE_CUTOFF}\n')
+    logging.debug(f'SEPERATORS cutoffs:\nHorizontal: {HORIZONTAL_LINE_CUTOFF}\nVertical: {VERTICAL_LINE_CUTOFF}\n')
     img = cv2.imread("dui.png")
     logging.info(f'img shape: {img.shape}\n')
     pprint(new_extract_cards_from_image(img))
