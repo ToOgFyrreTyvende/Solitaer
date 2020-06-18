@@ -2,12 +2,15 @@ import cv2
 import numpy as np
 import pytest
 from typing import Tuple, List
+import os
 
 from card_detector.yolodetector import scale_up_img, scale_down_img, new_extract_cards_from_image
 
 GamePile = List[List[str]]
 
+dirname = os.path.dirname(__file__)
 images = ['dui.png', 'cards2.jpg', 'cards3.jpg', 'cards4.jpg', 'cards5.jpg', 'egg.jpg']
+images = [os.path.join(dirname, item) for item in images]
 
 
 @pytest.mark.parametrize('img', [cv2.imread(images[-1])])
