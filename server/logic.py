@@ -71,7 +71,7 @@ class Klondike:
         return game
 
 
-def get_card_at(card_lst: List[Card], index: int = -1, to_str: bool = True) -> Union[Card, None]:
+def get_card_at(card_lst: List[Card], index: int = -1, to_str: bool = True) -> Union[str, Card, None]:
     """Takes a list of cards and returns the card at the given index
     :returns Card or None if no card is found at given index
     :returns str of Card if 'to_str' is True
