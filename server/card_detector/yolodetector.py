@@ -146,7 +146,7 @@ def infer_from_image(raw_img: np.ndarray) -> List[Detection]:
     # Scale image down/up the right way (cv2.resize(img, 608, 608) stretches the image, so we do it by scale)
     # scaled = scale_down_img(scale_up_img(raw_img))
     # scaled = scale_up_img(scale_down_img(raw_img))
-    logging.info(f'current img shape: {raw_img.shape}')
+    # logging.info(f'current img shape: {raw_img.shape}')
     scaled = scale_down_img(raw_img)
 
     height, width, _ = scaled.shape
@@ -158,8 +158,8 @@ def infer_from_image(raw_img: np.ndarray) -> List[Detection]:
 
     # Detecting the objects
     # https://docs.opencv.org/master/d6/d0f/group__dnn.html#ga29f34df9376379a603acd8df581ac8d7
-    # The first argument after img is the scale factor, then size, mean and swrapRB
-    # Scale factor is a multiplyer to scale. It is suggested to let this be 1/255, same as 0.00392
+    # The first argument after img is the scale factor, then size, mean and swapRB
+    # Scale factor is a multiplier to scale. It is suggested to let this be 1/255, same as 0.00392
     # https://www.learnopencv.com/deep-learning-based-object-detection-using-yolov3-with-opencv-python-c/
     # Size given as the target resolution, YOLO takes 416x416 images
     # Mean is scalar values subtracted from channels. We do not change any color values.
@@ -306,7 +306,7 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
     logging.debug(f'YOLO cutoffs:\nProbability: {PROBABILITY_CUTOFF}\nConfidence: {CONFIDENCE_CUTOFF}\n')
     logging.debug(f'SEPERATORS cutoffs:\nHorizontal: {HORIZONTAL_LINE_CUTOFF}\nVertical: {VERTICAL_LINE_CUTOFF}\n')
-    img = cv2.imread("dui.png")
+    img = cv2.imread("cards5.jpg")
     logging.info(f'img shape: {img.shape}\n')
     pprint(new_extract_cards_from_image(img))
     # cv2.imshow("Image", img)
