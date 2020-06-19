@@ -25,13 +25,22 @@ jobs:
       working-directory: ./client
       run: npm i
       
-    - name: Build and release
+    - name: Build frontend
       working-directory: ./client
       run: |
         NODE_ENV=prod npm run build
         rm -r /var/www/html/soli/img/
-        mv -v ./dist/* /var/www/html/soli/
+        mv -v ./dist/* ../server/app/
         echo "done :)"
+
+    - name: Prepare backend
+      working-directory: ./server
+      run: |
+        [ ! -d ".venv" ] && python -m venv .venv
+        source .venv/bin/activate
+        pip install -r requirements.txt
+        screen -X -S soli quit
+        screen -dmS soli bash -c 'FLASK_ENV=development flask run --host=0.0.0.0 --port 5555'
         
     - name: Purge cache
       uses: jakejarvis/cloudflare-purge-action@master
