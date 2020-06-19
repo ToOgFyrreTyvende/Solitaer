@@ -29,8 +29,8 @@ jobs:
       working-directory: ./client
       run: |
         NODE_ENV=prod npm run build
-        rm -r /var/www/html/soli/img/
-        mv -v ./dist/* ../server/app/
+        rm -r -v ../server/app/
+        mv -v ./dist/ ../server/app
         echo "done :)"
 
     - name: Prepare backend
