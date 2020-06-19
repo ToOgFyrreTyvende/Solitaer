@@ -21,9 +21,9 @@ jobs:
     - uses: actions/checkout@v2
       
     # Runs a single command using the runners shell
-   # - name: Fetch deps
-   #   working-directory: ./client
-   #   run: npm i
+    - name: Fetch deps
+      working-directory: ./client
+      run: npm i
       
     - name: Build and release
       working-directory: ./client
