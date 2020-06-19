@@ -28,7 +28,7 @@
     </div>
 
     <b-modal ref="modal" id="modal" size="xl" title="Hint" hide-footer hide-backdrop>
-      <diagram :kind="move_kind" v-bind:move="move"></diagram>
+      <diagram v-bind:kind="move_kind" v-bind:move="move"></diagram>
       <img class="img-fluid" v-bind:src="return_img" v-show="return_img != null" />
       <br />
       {{cards}}
