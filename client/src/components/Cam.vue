@@ -28,7 +28,7 @@
     </div>
 
     <b-modal ref="modal" id="modal" size="xl" title="Hint" hide-footer hide-backdrop>
-      <diagram kind="tableau" v-bind:move="move"></diagram>
+      <diagram v-bind:kind="move_kind" v-bind:move="move"></diagram>
       <img class="img-fluid" v-bind:src="return_img" v-show="return_img != null" />
       <br />
       {{cards}}
@@ -40,7 +40,7 @@
       :device-id="deviceId"
       width="100%"
       height="100%"
-      v-bind:resolution="{height: 720, width: 1280}"
+      v-bind:resolution="{height: 2160, width: 4096 }"
       @click.native="hideScreenElements()"
       @started="onStarted"
       @stopped="onStopped"
@@ -172,7 +172,7 @@
 .guide-line {
   z-index: 1;
   position: fixed;
-  top: 30%;
+  top: 25%;
   left: 0;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.6);
@@ -185,7 +185,7 @@
   position: fixed;
   top: 0;
   left: 35%;
-  height: 30%;
+  height: 25%;
   width: 1px;
   background-color: rgba(255, 255, 255, 0.6);
 }
@@ -261,9 +261,10 @@ export default {
       return_img: null,
       show_side_menu: false,
       cards: "",
+      move_kind: "",
       move: {
-        from: "Qs",
-        to: "Kh"
+        from: null,
+        to: null
       },
       steps: [
         {
@@ -384,11 +385,12 @@ export default {
       this.sendPicture();
       let _this = this;
       axios
-        .post("https://lambda.wtf/so/boardAnalyse", { data: this.img })
+        .post("https://lambda.wtf/so/getMove", { data: this.img })
         .then(({ data }) => {
-          _this.return_img = "data:image/png;base64," + data.img_data;
+          //_this.return_img = "data:image/png;base64," + data.img_data;
+          _this.move_kind = data.kind;
+          _this.move = data.move;
           _this.stopLoading();
-          _this.cards = data.cards;
           _this.$refs.modal.show();
         })
         .catch(error => {

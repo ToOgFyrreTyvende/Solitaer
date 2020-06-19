@@ -11,7 +11,7 @@
       Each new hint requires you to take a new picture of the updated playing board.
       The hints come back to the website in the following form:
     </p>
-    <card-diagram id="example_diagram" kind="foundation" :move="card_diagram_data"></card-diagram>
+    <card-diagram id="example_diagram" :kind="card_diagram_move_kind" :move="card_diagram_move"></card-diagram>
     <p>You can take a tour of the UI by clicking "Start tour", otherwise if you're ready to play, press skip!</p>
 
     <template v-slot:modal-footer="{ ok, hide }">
@@ -36,7 +36,8 @@ export default {
   data() {
     return {
       callback: null,
-      card_diagram_data: { from: "Qs", to: "Kh" }
+      card_diagram_move_kind: "TT",
+      card_diagram_move: { from: "Qs", to: "Kh" }
     };
   },
   methods: {
