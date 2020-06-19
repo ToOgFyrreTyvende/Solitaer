@@ -83,7 +83,7 @@ def find_move_wrapper(g: Klondike) -> Dict[str, Union[str, Dict[str, Union[str, 
     (If the function recommends moving a red queen to a black king that is...)
     """
     response: Dict[str, Union[str, Dict[str, Union[str, None]]]]
-    response = {'kind': 'MOVE', 'move': {'to': None, 'from': None}}
+    response = {'kind': None, 'move': {'to': None, 'from': None}}
 
     code, *instr = new_find_move(g)
     if code == MOVE_CODE.ERROR:
@@ -91,12 +91,15 @@ def find_move_wrapper(g: Klondike) -> Dict[str, Union[str, Dict[str, Union[str, 
     elif code == MOVE_CODE.DRAW:
         response['kind'] = 'DRAW'
     elif code == MOVE_CODE.T_TO_F:
+        response['kind'] = 'TF'
         response['move']['from'] = get_card_at(g.tableaus[instr[0]])
         response['move']['to'] = get_card_at(g.foundations[instr[1]])
     elif code == MOVE_CODE.T_TO_T:
+        response['kind'] = 'TT'
         response['move']['from'] = get_card_at(g.tableaus[instr[0]], index=-instr[2])
         response['move']['to'] = get_card_at(g.tableaus[instr[1]])
     elif code == MOVE_CODE.P_TO_F or code == MOVE_CODE.P_TO_T:
+        response['kind'] = 'PF' if code == MOVE_CODE.P_TO_F else 'PT'
         response['move']['from'] = get_card_at(g.pile)
         response['move']['to'] = get_card_at(g.foundations[instr[0]]) if code == MOVE_CODE.P_TO_F else get_card_at(g.tableaus[instr[0]])
 
