@@ -40,7 +40,7 @@ jobs:
         source .venv/bin/activate
         pip install -r requirements.txt
         screen -X -S soli quit || true
-        screen -dmS soli bash -c 'FLASK_ENV=development flask run --host=0.0.0.0 --port 5555'
+        screen -dmS soli bash -c 'source .venv/bin/activate && FLASK_ENV=development flask run --host=0.0.0.0 --port 5555'
         
     - name: Purge cache
       uses: jakejarvis/cloudflare-purge-action@master
