@@ -1,7 +1,18 @@
 <!-- https://codepen.io/zFunx/pen/bRqRmJ -->
 <template>
   <div class="diagram">
-    <template v-if="kind == 'DRAW'">
+    <template v-if="kind == 'ERROR'">
+      <div class="card-group">
+        <img :src="getImage('error')" />
+        <div class="hint">
+          <b-icon-x-circle style="width: 5rem; height: 5rem;">></b-icon-x-circle>
+          <h3>Could not find any moves</h3>
+        </div>
+        <div class="dummy"></div>
+      </div>
+    </template>
+
+    <template v-else-if="kind == 'DRAW'">
       <div class="card-group">
         <img :src="getImage('back')" />
         <div class="hint">
