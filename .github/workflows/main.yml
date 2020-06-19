@@ -44,7 +44,7 @@ jobs:
     - name: Deploy
       working-directory: ./server
       run: |
-        screen -L -Logfile log -dmS soli bash -c '. .venv/bin/activate && FLASK_ENV=development flask run --host=0.0.0.0 --port 5555'
+        screen -L log -dmS soli bash -c '. .venv/bin/activate && FLASK_ENV=development flask run --host=0.0.0.0 --port 5555'
                 
     - name: Purge cache
       uses: jakejarvis/cloudflare-purge-action@master
