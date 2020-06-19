@@ -5,7 +5,7 @@ from itertools import chain
 
 import cv2
 import numpy as np
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 from ai import find_move_wrapper
@@ -16,14 +16,14 @@ from logic import Klondike, Card
 DEBUG = True
 
 # instantiate the app
-app = Flask(__name__, static_folder='app', static_url_path="/app")
+app = Flask(__name__, static_folder='app', static_url_path="/")
 app.config.from_object(__name__)
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 # sanity check route
-@app.route('/ping', methods=['GET'])
+@app.route('/api/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
 
