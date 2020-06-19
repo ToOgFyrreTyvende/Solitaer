@@ -6,6 +6,7 @@ import configparser
 
 import cv2
 import numpy as np
+from card_detector.weights_downloader import download_if_not_exists
 from numpy.linalg import norm
 
 from card_detector.helpers import threshold_image, find_slices
@@ -27,7 +28,9 @@ HORIZONTAL_LINE_CUTOFF = sep_cfg.getfloat('horizontal', fallback=0.25)
 VERTICAL_LINE_CUTOFF = sep_cfg.getfloat('vertical', fallback=0.35)
 CLASS_IDS: List[str]
 
-weights = os.path.join(dirname, "reanchored.weights")
+
+download_if_not_exists("soli.weights", "http://lambda.wtf/mem/soli.weights")
+weights = os.path.join(dirname, "soli.weights")
 names = os.path.join(dirname, "cards.names")
 cfg = os.path.join(dirname, "cards.cfg")
 # load neural network from YOLO weights and config
@@ -53,7 +56,8 @@ def detect_cards(outputs, real_w, real_h):
             # The scores are the remaining values after 5. index. The first elements are x y w h pc (confidence probability) values
             # The confidences will be a confidence of a card being either of the 52 possible card suit + number combos.
             # The remaining elements of this array will have a value from 0.0 - 1.0
-            if detection[4] < PROBABILITY_CUTOFF: continue
+            if detection[4] < PROBABILITY_CUTOFF:
+                continue
             scores = detection[5:]
             # The class_id can be found from the INDEX of the highest value of these scores (the scores of each class)
             # argmax returns index of highest value
@@ -218,7 +222,8 @@ def create_stacks(bboxes: List[np.ndarray], detections: List[tuple], img_height:
                 D-------------C
                 If the APD + DPC + CPB + PBA > ABC + CDA, then the point P is not within the rectangle ABCD
                 """
-                area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                area_check = area(A, P, D) + area(D, P, C) + \
+                    area(C, P, B) + area(P, B, A)
                 if area_check == rect_area:
                     cards.append((P[1], str(CLASS_IDS[class_id])))
             tableaus.append([x[1] for x in sorted(cards, key=lambda x: x[0])])
@@ -227,14 +232,16 @@ def create_stacks(bboxes: List[np.ndarray], detections: List[tuple], img_height:
                 for class_id, confidence, pos in detections:
                     cx, cy, cw, ch = pos
                     P = [cx + cw/2, cy + ch/2]
-                    area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                    area_check = area(A, P, D) + area(D, P, C) + \
+                        area(C, P, B) + area(P, B, A)
                     if area_check == rect_area:
                         foundations.append(str(CLASS_IDS[class_id]))
             else:  # Cards are over the 30% line and left of the 35% line
                 for class_id, confidence, pos in detections:
                     cx, cy, cw, ch = pos
                     P = [cx + cw / 2, cy + ch / 2]
-                    area_check = area(A, P, D) + area(D, P, C) + area(C, P, B) + area(P, B, A)
+                    area_check = area(A, P, D) + area(D, P, C) + \
+                        area(C, P, B) + area(P, B, A)
                     if area_check == rect_area:
                         pile.append(str(CLASS_IDS[class_id]))
 
@@ -249,8 +256,10 @@ def new_create_stacks(boxes_and_slices: List[Tuple[np.ndarray, List[Detection]]]
     for key, group in groupby(boxes_and_slices, lambda x: x[0][2][1] < cutoff_y):
         upper_cards[key].extend(list(group))
 
-    pile: list = list(filter(lambda x: x[0][2][0] < cutoff_x, upper_cards[True]))
-    foundations: list = list(filter(lambda x: x[0][2][0] > cutoff_x, upper_cards[True]))
+    pile: list = list(
+        filter(lambda x: x[0][2][0] < cutoff_x, upper_cards[True]))
+    foundations: list = list(
+        filter(lambda x: x[0][2][0] > cutoff_x, upper_cards[True]))
     tableaus: list = upper_cards[False]
 
     return pile, foundations, tableaus
@@ -279,16 +288,21 @@ def new_extract_cards_from_image(img: np.ndarray) -> Tuple[List[str], List[List[
     img_slices = find_slices(processed_img, img)
 
     # Slice detection: (np.ndarray, [class: int, confidence: float, [x, y, w, h]])
-    slice_detections: List[Tuple[np.ndarray, List[Tuple[int, float, List[int]]]]]
+    slice_detections: List[Tuple[np.ndarray,
+                                 List[Tuple[int, float, List[int]]]]]
 
     logging.info('List of detections for each slice:')
-    slice_detections = [(box, infer_from_image(_img)) for box, _img in img_slices]
-    slice_detections = [item for item in slice_detections if len(item[1])]  # Remove elements with no detections
+    slice_detections = [(box, infer_from_image(_img))
+                        for box, _img in img_slices]
+    slice_detections = [item for item in slice_detections if len(
+        item[1])]  # Remove elements with no detections
     logging.info('End of detection list\n')
 
-    sorted_stacks = new_create_stacks(slice_detections, img_width=img.shape[1], img_height=img.shape[0])
+    sorted_stacks = new_create_stacks(
+        slice_detections, img_width=img.shape[1], img_height=img.shape[0])
 
-    pile, foundation, tableaus = [get_clean_card_stacks(stack) for stack in sorted_stacks]
+    pile, foundation, tableaus = [
+        get_clean_card_stacks(stack) for stack in sorted_stacks]
 
     return pile, foundation, tableaus
 
@@ -303,9 +317,12 @@ def get_card_classes(detections):
 
 if __name__ == "__main__":
     from pprint import pprint
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
-    logging.debug(f'YOLO cutoffs:\nProbability: {PROBABILITY_CUTOFF}\nConfidence: {CONFIDENCE_CUTOFF}\n')
-    logging.debug(f'SEPERATORS cutoffs:\nHorizontal: {HORIZONTAL_LINE_CUTOFF}\nVertical: {VERTICAL_LINE_CUTOFF}\n')
+    logging.basicConfig(format='%(levelname)s:%(message)s',
+                        level=logging.DEBUG)
+    logging.debug(
+        f'YOLO cutoffs:\nProbability: {PROBABILITY_CUTOFF}\nConfidence: {CONFIDENCE_CUTOFF}\n')
+    logging.debug(
+        f'SEPERATORS cutoffs:\nHorizontal: {HORIZONTAL_LINE_CUTOFF}\nVertical: {VERTICAL_LINE_CUTOFF}\n')
     img = cv2.imread("cards5.jpg")
     logging.info(f'img shape: {img.shape}\n')
     pprint(new_extract_cards_from_image(img))
