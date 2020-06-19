@@ -52,4 +52,5 @@ export default {
     '3s': require('@/assets/cards/3s.svg'),
     '2s': require('@/assets/cards/2s.svg'),
     'back': require('@/assets/cards/back.svg'),
+    null: require('@/assets/cards/blank.svg'),
 }

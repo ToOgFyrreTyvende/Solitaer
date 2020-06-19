@@ -1,36 +1,63 @@
 <!-- https://codepen.io/zFunx/pen/bRqRmJ -->
 <template>
   <div class="diagram">
-    <template v-if="kind == 'stock'">
+    <template v-if="kind == 'DRAW'">
       <div class="card-group">
         <img :src="getImage('back')" />
         <div class="hint">
           <b-icon-arrow-counterclockwise style="width: 5rem; height: 5rem;">></b-icon-arrow-counterclockwise>
-          <h3>Flip a stock card.</h3>
+          <h3>Draw a card</h3>
         </div>
         <div class="dummy"></div>
       </div>
     </template>
 
-    <template v-if="kind == 'foundation'">
+    <template v-else-if="kind == 'TF'">
       <div class="card-group">
         <img :src="getImage(move.from)" />
         <div class="hint">
           <b-icon-arrow-right style="width: 5rem; height: 5rem;">></b-icon-arrow-right>
           <br />
-          <h3>Move {{ move.from }} to foundation {{ move.to }}</h3>
+          <h3 v-if="move.to != null">Move from tableau to foundation</h3>
+          <h3 v-else>Move from tableau to empty foundation</h3>
         </div>
         <img :src="getImage(move.to)" />
       </div>
     </template>
 
-    <template v-if="kind == 'tableau'">
+    <template v-else-if="kind == 'TT'">
       <div class="card-group">
         <img :src="getImage(move.from)" />
         <div class="hint">
           <b-icon-arrow-right style="width: 5rem; height: 5rem;">></b-icon-arrow-right>
           <br />
-          <h3>Move card {{ move.from }} to {{ move.to }}</h3>
+          <h3>Move from tableau to tableau</h3>
+        </div>
+        <img :src="getImage(move.to)" />
+      </div>
+    </template>
+
+    <template v-else-if="kind == 'PF'">
+      <div class="card-group">
+        <img :src="getImage(move.from)" />
+        <div class="hint">
+          <b-icon-arrow-right style="width: 5rem; height: 5rem;">></b-icon-arrow-right>
+          <br />
+          <h3 v-if="move.to != null">Move from pile to foundation</h3>
+          <h3 v-else>Move from pile to empty foundation</h3>
+        </div>
+        <img :src="getImage(move.to)" />
+      </div>
+    </template>
+
+    <template v-else-if="kind == 'PT'">
+      <div class="card-group">
+        <img :src="getImage(move.from)" />
+        <div class="hint">
+          <b-icon-arrow-right style="width: 5rem; height: 5rem;">></b-icon-arrow-right>
+          <br />
+          <h3 v-if="move.to != null">Move from pile to tableau</h3>
+          <h3 v-else>Move from pile to empty tableau</h3>
         </div>
         <img :src="getImage(move.to)" />
       </div>
