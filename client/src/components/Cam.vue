@@ -388,6 +388,8 @@ export default {
 
       this.$refs.take_picture.classList.remove("fade-out");
       this.$refs.take_picture.classList.add("fade-out");
+
+      this.loading = true;
     },
     stopLoading() {
       this.$refs.flashing_bg.classList.remove("flash-bg");
@@ -399,10 +401,6 @@ export default {
       this.hideScreenElements();
       this.flashAndFade();
 
-      setTimeout(() => {
-        this.loading = true;
-      }, 310);
-
       this.sendPicture();
       let _this = this;
       axios
@@ -411,8 +409,8 @@ export default {
           //_this.return_img = "data:image/png;base64," + data.img_data;
           _this.move_kind = data.kind;
           _this.move = data.move;
-          _this.stopLoading();
           _this.$refs.modal.show();
+          _this.stopLoading();
         })
         .catch(error => {
           console.log(error);
