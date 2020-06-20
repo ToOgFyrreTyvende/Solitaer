@@ -385,7 +385,7 @@ export default {
       this.sendPicture();
       let _this = this;
       axios
-        .post("https://soli.lambda.wtf/api/getMove", { data: this.img })
+        .post("/api/getMove", { data: this.img })
         .then(({ data }) => {
           //_this.return_img = "data:image/png;base64," + data.img_data;
           _this.move_kind = data.kind;
