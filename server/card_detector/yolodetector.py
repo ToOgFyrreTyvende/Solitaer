@@ -21,7 +21,7 @@ config.read(config_file)
 yolo_cfg = config['YOLO']
 sep_cfg = config['SEPARATORS']
 
-DEBUG = True
+DEBUG = False
 CONFIDENCE_CUTOFF = yolo_cfg.getfloat('confidence', fallback=0.3)
 PROBABILITY_CUTOFF = yolo_cfg.getfloat('probability', fallback=0.5)
 HORIZONTAL_LINE_CUTOFF = sep_cfg.getfloat('horizontal', fallback=0.25)
@@ -290,10 +290,10 @@ def new_extract_cards_from_image(img: np.ndarray) -> Tuple[List[str], List[List[
     # Slice detection: (np.ndarray, [class: int, confidence: float, [x, y, w, h]])
     slice_detections: List[Tuple[np.ndarray,
                                  List[Tuple[int, float, List[int]]]]]
-
     logging.info('List of detections for each slice:')
     slice_detections = [(box, infer_from_image(_img))
                         for box, _img in img_slices]
+    print(slice_detections)
     slice_detections = [item for item in slice_detections if len(
         item[1])]  # Remove elements with no detections
     logging.info('End of detection list\n')
