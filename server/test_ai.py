@@ -4,7 +4,7 @@ from typing import Union, Tuple
 import pytest
 
 from ai import MOVE_CODE, new_find_move, find_move_wrapper
-from logic import draw, move, Klondike, get_card_at
+from logic import draw, move, Klondike, get_card_at, Card
 
 
 def build_test_games() -> Tuple[Klondike, Klondike, Klondike, Klondike]:
@@ -48,13 +48,16 @@ def build_test_games() -> Tuple[Klondike, Klondike, Klondike, Klondike]:
 
 game_after_draw, g_move4, g_move3, g_move1 = build_test_games()
 
+game5 = Klondike()
+game5.tableaus[0] = [Card.from_str('As')]
 
 @pytest.mark.parametrize('game, expected', [
     (Klondike.new_game(), (MOVE_CODE.DRAW,)),
     (game_after_draw, (MOVE_CODE.T_TO_T, 1, 2, 1)),
     (g_move4, (MOVE_CODE.P_TO_T, 2)),
     (g_move3, (MOVE_CODE.P_TO_F, 0)),
-    (g_move1, (MOVE_CODE.T_TO_F, 2, 1))
+    (g_move1, (MOVE_CODE.T_TO_F, 2, 1)),
+    (game5, (MOVE_CODE.T_TO_F, 0, 0))
 ])
 def test_new_find_move(game: Klondike, expected: Union[int, Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]):
     assert new_find_move(game) == expected
