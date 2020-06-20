@@ -1,6 +1,14 @@
 <template>
-  <div class="container">
+  <div class="container" ref="container">
     <loader v-show="loading" type="1"></loader>
+
+    <div class="fullscreenContainer" ref="fullscreenToggler" @click="fullscreenToggle()">
+      <b-icon
+        :icon="fullscreen ? 'fullscreen-exit' : 'fullscreen'"
+        style="width: 27px; height: 27px;"
+        variant="white"
+      ></b-icon>
+    </div>
 
     <div
       data-v-step="0"
@@ -85,6 +93,18 @@
   left: 0;
 }
 
+.fullscreenContainer {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  cursor: pointer;
+  display: inline-block;
+  transition: 0.3s;
+  background-color: rgba(33, 33, 33, 0.9);
+  padding: 0.8rem;
+}
+
 .menuToggleContainer {
   position: fixed;
   top: 1rem;
@@ -99,7 +119,7 @@
 .bar1,
 .bar2,
 .bar3 {
-  width: 35px;
+  width: 27px;
   height: 5px;
   background-color: #f8f8f8;
   transition: 0.4s;
@@ -266,6 +286,7 @@ export default {
         from: null,
         to: null
       },
+      fullscreen: false,
       steps: [
         {
           target: '[data-v-step="0"]',
@@ -416,6 +437,42 @@ export default {
       this.deviceId = deviceId;
       this.camera = deviceId;
       console.log("On Camera Change Event", deviceId);
+    },
+    fullscreenToggle() {
+      if (this.fullscreen) {
+        this.stopFullscreen();
+      } else {
+        this.startFullscreen();
+      }
+      this.fullscreen = !this.fullscreen;
+    },
+    startFullscreen() {
+      if (this.$refs.container.requestFullscreen) {
+        this.$refs.container.requestFullscreen();
+      } else if (this.$refs.container.mozRequestFullScreen) {
+        /* Firefox */
+        this.$refs.container.mozRequestFullScreen();
+      } else if (this.$refs.container.webkitRequestFullscreen) {
+        /* Chrome, Safari and Opera */
+        this.$refs.container.webkitRequestFullscreen();
+      } else if (this.$refs.container.msRequestFullscreen) {
+        /* IE/Edge */
+        this.$refs.container.msRequestFullscreen();
+      }
+    },
+    stopFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        /* IE/Edge */
+        document.msExitFullscreen();
+      }
     }
   }
 };
