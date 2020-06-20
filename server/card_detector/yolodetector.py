@@ -77,7 +77,9 @@ def detect_cards(outputs, real_w, real_h):
                 # x and y of the detection can be found too
                 x = int(center_x - w / 2)
                 y = int(center_y - h / 2)
-
+                if x < 0 or y < 0:
+                    continue
+                
                 # now we have a proper prediction with coordinates and confidence, along with its class id.
                 # We add this to a resulting array. Also we keep a set of detected class ids to remove duplicate card detections.
                 bounding_boxes.append([x, y, w, h])
