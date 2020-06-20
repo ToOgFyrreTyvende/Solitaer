@@ -21,7 +21,7 @@ config.read(config_file)
 yolo_cfg = config['YOLO']
 sep_cfg = config['SEPARATORS']
 
-DEBUG = False
+DEBUG = True
 CONFIDENCE_CUTOFF = yolo_cfg.getfloat('confidence', fallback=0.3)
 PROBABILITY_CUTOFF = yolo_cfg.getfloat('probability', fallback=0.5)
 HORIZONTAL_LINE_CUTOFF = sep_cfg.getfloat('horizontal', fallback=0.25)
@@ -77,8 +77,6 @@ def detect_cards(outputs, real_w, real_h):
                 # x and y of the detection can be found too
                 x = int(center_x - w / 2)
                 y = int(center_y - h / 2)
-                if x < 0 or y < 0:
-                    continue
                 
                 # now we have a proper prediction with coordinates and confidence, along with its class id.
                 # We add this to a resulting array. Also we keep a set of detected class ids to remove duplicate card detections.
