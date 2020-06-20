@@ -34,8 +34,10 @@ def get_move_from_img(img: np.ndarray) -> Dict[str, Union[str, Dict[str, Union[s
 
     game = Klondike()
     game.pile = [Card.from_str(card) for card in img_pile]
-    game.foundations = [[Card.from_str(card) for card in lst] for lst in img_founds]
-    game.tableaus = [[Card.from_str(card) for card in lst] for lst in img_tableaus]
+    for real_foundation, detected_foundation in zip(game.foundations, img_founds):
+        real_foundation.extend([Card.from_str(card) for card in detected_foundation])
+    for real_tableau, detected_tableau in zip(game.tableaus, img_tableaus):
+        real_tableau.extend([Card.from_str(card) for card in detected_tableau])
 
     return find_move_wrapper(game)
 
