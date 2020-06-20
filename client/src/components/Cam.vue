@@ -35,7 +35,7 @@
       <b-button @click="guideOpen()">Show guide</b-button>
     </div>
 
-    <b-modal ref="modal" id="modal" size="xl" title="Hint" hide-footer hide-backdrop>
+    <b-modal static="true" ref="modal" id="modal" size="xl" title="Hint" hide-footer hide-backdrop>
       <diagram v-bind:kind="move_kind" v-bind:move="move"></diagram>
       <img class="img-fluid" v-bind:src="return_img" v-show="return_img != null" />
       <br />
