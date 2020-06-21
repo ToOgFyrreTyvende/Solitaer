@@ -56,7 +56,7 @@ def detect_cards(outputs, real_w, real_h):
             # The scores are the remaining values after 5. index. The first elements are x y w h pc (confidence probability) values
             # The confidences will be a confidence of a card being either of the 52 possible card suit + number combos.
             # The remaining elements of this array will have a value from 0.0 - 1.0
-            if detection[4] < PROBABILITY_CUTOFF:
+            if detection[4] <= PROBABILITY_CUTOFF:
                 continue
             scores = detection[5:]
             # The class_id can be found from the INDEX of the highest value of these scores (the scores of each class)
