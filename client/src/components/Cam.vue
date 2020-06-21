@@ -192,7 +192,7 @@
 .guide-line {
   z-index: 1;
   position: fixed;
-  top: 25%;
+  top: 35%;
   left: 0;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.6);
@@ -205,7 +205,7 @@
   position: fixed;
   top: 0;
   left: 35%;
-  height: 25%;
+  height: 35%;
   width: 1px;
   background-color: rgba(255, 255, 255, 0.6);
 }
