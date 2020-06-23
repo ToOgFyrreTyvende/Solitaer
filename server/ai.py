@@ -36,11 +36,10 @@ def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, 
      2: tableau -> tableau    => (code, tableau_id   , tableau_id   , number of cards)
      3: pile    -> foundation => (code, foundation_id)
      4: pile    -> tableau    => (code, tableau_id)
-    -1: Error, no valid moved found :(
 
     If a valid move exists, it returns an int and two card piles.
     The int specifies the index from the first list to move to the other list
-    If no valid move is found, it returns a tuple with the error code (int): -1
+    If no valid move is found, it returns a tuple with the draw code (int): 0
     """
 
     # Draw cards if the pile is empty and there are cards in the stock
@@ -68,10 +67,10 @@ def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, 
             if check_move(g.pile[-1], tableau):
                 return MOVE_CODE.P_TO_T, to_id  # code 4
 
-    if len(g.pile) + len(g.stock) > 1:
-        return MOVE_CODE.DRAW,
+    # if len(g.pile) + len(g.stock) > 1:
+    #     return MOVE_CODE.DRAW,
 
-    return MOVE_CODE.ERROR,  # No other options matched, give up
+    return MOVE_CODE.DRAW,  # No other options matched, give up
 
 
 def find_move_wrapper(g: Klondike) -> Dict[str, Union[str, Dict[str, Union[str, None]]]]:
