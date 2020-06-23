@@ -133,8 +133,9 @@ def test_winrate():
                 g.pile, g.tableaus[instr[0]] = move(1, g.pile, g.tableaus[instr[0]])
         if game_won(g): wins += 1
     assert wins > 290
+    print(f'\n\nwins:\t\t{wins}\nlosses:\t\t{1000-wins}\npercentage:\t{wins/10}%\n')
 
 
 if __name__ == "__main__":
-    pytest.main(args=['test_ai.py', '-vv'])
+    pytest.main(args=['test_ai.py', '--capture=tee-sys'])
 
