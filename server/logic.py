@@ -90,8 +90,8 @@ def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[C
     if len(stock) == 0:
         _stock = list(reversed(pile))
         _pile = []
-    elif len(stock) >= 3:
-        for i in range(3):
+    elif len(stock) >= nb_cards:
+        for i in range(nb_cards):
             _pile.append(_stock.pop(-1))
     else:
         for i in range(len(stock)):
