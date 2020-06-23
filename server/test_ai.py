@@ -1,9 +1,10 @@
+import random
 from copy import deepcopy
 from typing import Union, Tuple, Dict, Optional
 
 import pytest
 
-from ai import MOVE_CODE, new_find_move, find_move_wrapper
+from ai import MOVE_CODE, new_find_move, find_move_wrapper, game_won
 from logic import draw, move, Klondike, get_card_at, Card
 
 # Custom types
@@ -94,5 +95,34 @@ def test_find_move_wrapper(game: Klondike, expected: WrappedMove):
     assert find_move_wrapper(game) == expected
 
 
+def test_winrate():
+    wins: int = 0
+    random.seed(21522)
+
+    for i in range(1000):
+        g = Klondike.new_game()
+        consecutive_draws = 0
+        while not game_won(g) and consecutive_draws < 24:
+            code, *instr = new_find_move(g)
+            if code == MOVE_CODE.DRAW:
+                consecutive_draws += 1
+                g.stock, g.pile = draw(g.stock, g.pile, nb_cards=1)
+            elif code == MOVE_CODE.T_TO_F:
+                consecutive_draws = 0
+                g.tableaus[instr[0]], g.foundations[instr[1]] = move(1, g.tableaus[instr[0]], g.foundations[instr[1]])
+            elif code == MOVE_CODE.T_TO_T:
+                consecutive_draws = 0
+                g.tableaus[instr[0]], g.tableaus[instr[1]] = move(instr[2], g.tableaus[instr[0]], g.tableaus[instr[1]])
+            elif code == MOVE_CODE.P_TO_F:
+                consecutive_draws = 0
+                g.pile, g.foundations[instr[0]] = move(1, g.pile, g.foundations[instr[0]])
+            elif code == MOVE_CODE.P_TO_T:
+                consecutive_draws = 0
+                g.pile, g.tableaus[instr[0]] = move(1, g.pile, g.tableaus[instr[0]])
+        if game_won(g): wins += 1
+    assert wins > 290
+
+
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main(args=['test_ai.py', '-vv'])
+
