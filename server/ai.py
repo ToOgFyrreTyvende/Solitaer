@@ -67,9 +67,6 @@ def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, 
             if check_move(g.pile[-1], tableau):
                 return MOVE_CODE.P_TO_T, to_id  # code 4
 
-    # if len(g.pile) + len(g.stock) > 1:
-    #     return MOVE_CODE.DRAW,
-
     return MOVE_CODE.DRAW,  # No other options matched, give up
 
 

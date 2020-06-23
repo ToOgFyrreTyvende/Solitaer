@@ -123,10 +123,6 @@ def check_move(card: Card, target: List[Card], to_foundation: bool = False) -> b
     else: return card.is_black != target[-1].is_black and card.value == target[-1].value - 1
 
 
-def _print_helper(base_stack: List[Card], tableau: List[Card]) -> str:
-    return f''
-
-
 def _foundation_str(foundation: List[Card]) -> str:
     return f'|{foundation[-1]}|' if len(foundation) > 0 else '|   |'
 

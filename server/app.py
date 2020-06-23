@@ -1,15 +1,14 @@
 import base64
-import uuid
-from typing import Union, Dict
 from itertools import chain
+from typing import Union, Dict
 
 import cv2
 import numpy as np
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from ai import find_move_wrapper
-from card_detector.yolodetector import extract_cards_from_image, get_card_classes, new_extract_cards_from_image
+from card_detector.yolodetector import new_extract_cards_from_image
 from logic import Klondike, Card
 
 # configuration
@@ -22,10 +21,12 @@ app.config.from_object(__name__)
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
+
 # sanity check route
 @app.route('/api/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
+
 
 def get_move_from_img(img: np.ndarray) -> Dict[str, Union[str, Dict[str, Union[str, None]]]]:
     result = new_extract_cards_from_image(img)
@@ -41,6 +42,7 @@ def get_move_from_img(img: np.ndarray) -> Dict[str, Union[str, Dict[str, Union[s
 
     return find_move_wrapper(game)
 
+
 @app.route('/api/getMove', methods=['POST'])
 def get_next_klondike_move():
     img_data = request.json['data'][23:]
@@ -49,10 +51,12 @@ def get_next_klondike_move():
 
     return jsonify(get_move_from_img(img))
 
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
     return app.send_static_file("index.html")
+
 
 if __name__ == '__main__':
     app.run()
