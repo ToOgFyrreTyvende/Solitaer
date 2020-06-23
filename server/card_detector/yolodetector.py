@@ -12,6 +12,7 @@ from card_detector.helpers import threshold_image, find_slices
 from card_detector.weights_downloader import download_if_not_exists
 
 Detection = Tuple[int, float, List[int]]
+FullDetection = Tuple[np.ndarray, List[Detection]]
 
 dirname = os.path.dirname(__file__)
 config_file = os.path.join(dirname, '../config.cfg')
@@ -136,8 +137,7 @@ def infer_from_image(raw_img: np.ndarray) -> List[Detection]:
     top_bot = int((608 - height) / 2)
     left_right = int((608 - width) / 2)
 
-    image = cv2.copyMakeBorder(
-        scaled, top_bot, top_bot, left_right, left_right, cv2.BORDER_CONSTANT)
+    image = cv2.copyMakeBorder(scaled, top_bot, top_bot, left_right, left_right, cv2.BORDER_CONSTANT)
 
     # Detecting the objects
     # https://docs.opencv.org/master/d6/d0f/group__dnn.html#ga29f34df9376379a603acd8df581ac8d7
@@ -166,7 +166,7 @@ def area(a, b, c):
     return 0.5 * norm(np.cross(b - a, c - a))
 
 
-def new_create_stacks(boxes_and_slices: List[Tuple[np.ndarray, List[Detection]]], img_height: int, img_width: int) -> Tuple[List[Tuple[np.ndarray, List[Detection]]], List[Tuple[np.ndarray, List[Detection]]], List[Tuple[np.ndarray, List[Detection]]]]:
+def new_create_stacks(boxes_and_slices: List[FullDetection], img_height: int, img_width: int) -> Tuple[List[FullDetection], List[FullDetection], List[FullDetection]]:
     cutoff_y: int = int(img_height * HORIZONTAL_LINE_CUTOFF)
     cutoff_x: int = int(img_width * VERTICAL_LINE_CUTOFF)
 
@@ -174,16 +174,14 @@ def new_create_stacks(boxes_and_slices: List[Tuple[np.ndarray, List[Detection]]]
     for key, group in groupby(boxes_and_slices, lambda x: x[0][2][1] < cutoff_y):
         upper_cards[key].extend(list(group))
 
-    pile: list = list(
-        filter(lambda x: x[0][2][0] < cutoff_x, upper_cards[True]))
-    foundations: list = list(
-        filter(lambda x: x[0][2][0] > cutoff_x, upper_cards[True]))
+    pile: list = list(filter(lambda x: x[0][2][0] < cutoff_x, upper_cards[True]))
+    foundations: list = list(filter(lambda x: x[0][2][0] > cutoff_x, upper_cards[True]))
     tableaus: list = upper_cards[False]
 
     return pile, foundations, tableaus
 
 
-def get_clean_card_stacks(card_stack: List[Tuple[np.ndarray, List[Detection]]]) -> Union[List[str], List[List[str]]]:
+def get_clean_card_stacks(card_stack: List[FullDetection]) -> Union[List[str], List[List[str]]]:
     result: List[List[str]] = []
     for _, detections in card_stack:
         cards = []
@@ -198,21 +196,16 @@ def new_extract_cards_from_image(img: np.ndarray) -> Tuple[List[str], List[List[
     img_slices = find_slices(processed_img, img)
 
     # Slice detection: (np.ndarray, [class: int, confidence: float, [x, y, w, h]])
-    slice_detections: List[Tuple[np.ndarray,
-                                 List[Tuple[int, float, List[int]]]]]
+    slice_detections: List[Tuple[np.ndarray, List[Tuple[int, float, List[int]]]]]
     logging.info('List of detections for each slice:')
-    slice_detections = [(box, infer_from_image(_img))
-                        for box, _img in img_slices]
+    slice_detections = [(box, infer_from_image(_img)) for box, _img in img_slices]
     print(slice_detections)
-    slice_detections = [item for item in slice_detections if len(
-        item[1])]  # Remove elements with no detections
+    slice_detections = [item for item in slice_detections if len(item[1])]  # Remove elements with no detections
     logging.info('End of detection list\n')
 
-    sorted_stacks = new_create_stacks(
-        slice_detections, img_width=img.shape[1], img_height=img.shape[0])
+    sorted_stacks = new_create_stacks(slice_detections, img_width=img.shape[1], img_height=img.shape[0])
 
-    pile, foundation, tableaus = [
-        get_clean_card_stacks(stack) for stack in sorted_stacks]
+    pile, foundation, tableaus = [get_clean_card_stacks(stack) for stack in sorted_stacks]
 
     return pile, foundation, tableaus
 
@@ -227,12 +220,9 @@ def get_card_classes(detections):
 
 if __name__ == "__main__":
     from pprint import pprint
-    logging.basicConfig(format='%(levelname)s:%(message)s',
-                        level=logging.DEBUG)
-    logging.debug(
-        f'YOLO cutoffs:\nProbability: {PROBABILITY_CUTOFF}\nConfidence: {CONFIDENCE_CUTOFF}\n')
-    logging.debug(
-        f'SEPERATORS cutoffs:\nHorizontal: {HORIZONTAL_LINE_CUTOFF}\nVertical: {VERTICAL_LINE_CUTOFF}\n')
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+    logging.debug(f'YOLO cutoffs:\nProbability: {PROBABILITY_CUTOFF}\nConfidence: {CONFIDENCE_CUTOFF}\n')
+    logging.debug(f'SEPERATORS cutoffs:\nHorizontal: {HORIZONTAL_LINE_CUTOFF}\nVertical: {VERTICAL_LINE_CUTOFF}\n')
     img = cv2.imread("cards5.jpg")
     logging.info(f'img shape: {img.shape}\n')
     pprint(new_extract_cards_from_image(img))
