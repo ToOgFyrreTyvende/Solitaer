@@ -22,9 +22,9 @@ def get_nr_of_flipped(tableau: List[Card]) -> int:
 
 
 def game_won(g: Klondike):
-    if len(g.foundations[0]) == 13 and len(g.foundations[1]) == 13 and len(g.foundations[2]) == 13 and len(g.foundations[3]) == 13:
-        return True
-    return False
+    for foundation in g.foundations:
+        if not len(foundation) or foundation[-1].value != 13: return False
+    return True
 
 
 def new_find_move(g: Klondike) -> Union[Tuple[int], Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]:

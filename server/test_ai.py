@@ -56,6 +56,18 @@ g_move_tt, g_move_pt, g_move_pf, g_move_tf = build_test_games()
 g_ace_to_f = Klondike()
 g_ace_to_f.tableaus[0].append(Card.from_str('As'))
 
+complete_game = Klondike()
+for foundation in complete_game.foundations:
+    foundation.append(Card(13, '_'))
+
+
+@pytest.mark.parametrize('game, expected', [
+    (Klondike.new_game(), False),
+    (complete_game, True),
+])
+def test_game_won(game: Klondike, expected: bool):
+    assert game_won(game) == expected
+
 
 @pytest.mark.parametrize('game, expected', [
     (Klondike.new_game(), (MOVE_CODE.DRAW,)),

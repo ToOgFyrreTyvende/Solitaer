@@ -51,6 +51,12 @@ class Klondike:
     tableaus: List[List[Card]] = field(default_factory=lambda: [[], [], [], [], [], [], []])
     foundations: List[List[Card]] = field(default_factory=lambda: [[], [], [], []])
 
+    @property
+    def is_won(self) -> bool:
+        for foundation in self.foundations:
+            if not len(foundation) or foundation[-1].value != 13: return False
+        return True
+
     @staticmethod
     def new_game(shuffle: bool = True) -> Klondike:
         deck = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
