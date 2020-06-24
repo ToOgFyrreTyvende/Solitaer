@@ -51,6 +51,12 @@ class Klondike:
     tableaus: List[List[Card]] = field(default_factory=lambda: [[], [], [], [], [], [], []])
     foundations: List[List[Card]] = field(default_factory=lambda: [[], [], [], []])
 
+    @property
+    def is_won(self) -> bool:
+        for foundation in self.foundations:
+            if not len(foundation) or foundation[-1].value != 13: return False
+        return True
+
     @staticmethod
     def new_game(shuffle: bool = True) -> Klondike:
         deck = [Card(value, suit) for value in range(1, 14) for suit in list(SUITS.values())]
@@ -90,8 +96,8 @@ def draw(stock: List[Card], pile: List[Card], nb_cards: int = 3) -> Tuple[List[C
     if len(stock) == 0:
         _stock = list(reversed(pile))
         _pile = []
-    elif len(stock) >= 3:
-        for i in range(3):
+    elif len(stock) >= nb_cards:
+        for i in range(nb_cards):
             _pile.append(_stock.pop(-1))
     else:
         for i in range(len(stock)):
@@ -121,10 +127,6 @@ def check_move(card: Card, target: List[Card], to_foundation: bool = False) -> b
 
     if to_foundation: return card.suit == target[-1].suit and card.value == target[-1].value + 1
     else: return card.is_black != target[-1].is_black and card.value == target[-1].value - 1
-
-
-def _print_helper(base_stack: List[Card], tableau: List[Card]) -> str:
-    return f''
 
 
 def _foundation_str(foundation: List[Card]) -> str:
