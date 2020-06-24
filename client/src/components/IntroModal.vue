@@ -1,5 +1,5 @@
 <template>
-  <b-modal ref="intro_modal" id="intro_modal" size="xl" title="Introduction" hide-backdrop>
+  <b-modal static="true" ref="intro_modal" id="intro_modal" size="xl" title="Introduction" hide-backdrop>
     Welcome to our Solitaire hinting app!
     In order to use this program, we have a couple of requirements:
     <ul>
