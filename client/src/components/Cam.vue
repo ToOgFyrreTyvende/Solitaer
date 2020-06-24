@@ -2,7 +2,12 @@
   <div class="container" ref="container">
     <loader v-show="loading" type="1"></loader>
 
-    <div class="fullscreenContainer" ref="fullscreenToggler" @click="fullscreenToggle()">
+    <div
+      class="fullscreenContainer"
+      ref="fullscreenToggler"
+      @click="fullscreenToggle()"
+      v-show="!in_pwa"
+    >
       <b-icon
         :icon="fullscreen ? 'fullscreen-exit' : 'fullscreen'"
         style="width: 27px; height: 27px;"
@@ -273,7 +278,6 @@ export default {
   },
   data() {
     return {
-      msg: "tewtwehts",
       camera: null,
       deviceId: null,
       devices: [],
@@ -287,6 +291,7 @@ export default {
         to: null
       },
       fullscreen: false,
+      in_pwa: false,
       steps: [
         {
           target: '[data-v-step="0"]',
@@ -315,6 +320,13 @@ export default {
     };
   },
   mounted() {
+    const pwaModeEnabled =
+      window.navigator.standAlone || // Safari
+      window.fullScreen || // FireFox
+      (!window.screenTop && !window.screenY); // Chrome
+
+    this.in_pwa = pwaModeEnabled;
+
     if (localStorage.intro != "true") {
       localStorage.intro = true;
       this.guideOpen();
