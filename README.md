@@ -29,7 +29,7 @@ Nu kan `flask run` køres for at starte webserveren. Default port er 5000, så h
 **Når serveren startes, henter den en 250 mb stor fil** fra vores egen server. Det er vægtene til det neurale netværk som vi har trænet. Det vil fremkomme i terminalen når denne filhenting igangsættes/færdiggøres, og webserveren er ikke tilgængelig indtil dette er færdiggort!
 
 ## Troubleshooting af server
-- Hvis serveren ikke download vægtene korrekt, altså hvis filen er under 250 mb, anbefaler vi at hente filen selv gennem linket https://lambda.wtf/mem/soli.weights og placere den i mappen server/card_detector/ med det samme navn som fremgår i linket.
+- Hvis serveren ikke download vægtene korrekt, altså hvis filen er under 250 mb, anbefaler vi at hente filen selv gennem linket https://lambda.wtf/mem/soli.weights og placere den i mappen server/card_detector/ med det samme navn som fremgår i linket. Hvis linket er utilgængeligt, så er vægtene også uploaded her https://drive.google.com/file/d/1zBiBz00bdo3JQr8Aa8L0CFSTrGb-qZeJ/view
 
 # Selv-byg af klient (Ikke nødvendigt)
 Med node version 12+ installeret, gå ind i client mappen
